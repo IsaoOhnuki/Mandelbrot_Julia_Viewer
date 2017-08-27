@@ -18,6 +18,8 @@
                 <Entry x:Name="EntryRepert" Text="{Binding Repert, Mode=TwoWay}" VerticalOptions="Center"/>
                 <Label Text="Resolution" VerticalTextAlignment="Center"/>
                 <Entry x:Name="EntryResolution" Text="{Binding Resolution, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Label Text="ColorParette" VerticalTextAlignment="Center"/>
+                <Switch IsToggled="{Binding UseColorParette}"/>
                 <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>
                 <Button x:Name="BtnJulia" Text="Julia" Command="{Binding JuliaRun}"/>
             </StackLayout>

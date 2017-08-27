@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Models
 {
@@ -15,6 +16,7 @@ namespace Models
         public double Radius { get; set; }
         public int Repert { get; set; }
         public int Resolution { get; set; }
+        public int ColorParette { get; set; }
         private int[] data;
         public int[] Data
         {
@@ -52,10 +54,11 @@ namespace Models
             Radius = mj.Radius;
             Repert = mj.Repert;
             Resolution = mj.Resolution;
+            ColorParette = mj.ColorParette;
             Data = mj.Data;
             Image = mj.Image;
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int colorParette)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -64,8 +67,9 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
+            ColorParette = colorParette;
         }
-        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution)
+        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, int colorParette)
         {
             IPos = ipos;
             JPos = jpos;
@@ -74,6 +78,7 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
+            ColorParette = colorParette;
         }
 
         public static bool operator ==(Mandelbrot_Julia l, Mandelbrot_Julia r)
@@ -94,7 +99,8 @@ namespace Models
                 && (Double.IsNaN(YPos) ? Double.IsNaN(((Mandelbrot_Julia)obj).YPos) : YPos == ((Mandelbrot_Julia)obj).YPos)
                 && (Double.IsNaN(Radius) ? Double.IsNaN(((Mandelbrot_Julia)obj).Radius) : Radius == ((Mandelbrot_Julia)obj).Radius)
                 && Repert == ((Mandelbrot_Julia)obj).Repert
-                && Resolution == ((Mandelbrot_Julia)obj).Resolution;
+                && Resolution == ((Mandelbrot_Julia)obj).Resolution
+                && ColorParette == ((Mandelbrot_Julia)obj).ColorParette;
         }
 
         public override int GetHashCode()
@@ -102,22 +108,72 @@ namespace Models
             return base.GetHashCode();
         }
 
-        public static Task<byte[]> Develop(int repert, int[] data)
+        public static Task<byte[]> Develop(int repert, int[] data, Color[] cols = null)
         {
             return
             Task.Run<byte[]>(() =>
             {
                 byte[] image = new byte[data.GetLength(0) * 4];
                 int dataIndex = 0;
-                foreach (int d in data)
+                if (cols == null)
                 {
-                    image[dataIndex++] = (byte)(256.0 * d / repert);
-                    image[dataIndex++] = (byte)(256.0 * d * 2.0 / repert);
-                    image[dataIndex++] = (byte)(256.0 * d * 4.0 / repert);
-                    image[dataIndex++] = 255;
+                    foreach (int d in data)
+                    {
+                        image[dataIndex++] = (byte)(256.0 * d / repert);
+                        image[dataIndex++] = (byte)(256.0 * d * 2.0 / repert);
+                        image[dataIndex++] = (byte)(256.0 * d * 4.0 / repert);
+                        image[dataIndex++] = 255;
+                    }
+                }
+                else
+                {
+                    foreach (int d in data)
+                    {
+                        image[dataIndex++] = (byte)(255.0 * cols[d].B);
+                        image[dataIndex++] = (byte)(255.0 * cols[d].G);
+                        image[dataIndex++] = (byte)(255.0 * cols[d].R);
+                        image[dataIndex++] = 255;
+                    }
                 }
                 return image;
             });
+        }
+
+        public struct ColorResolutionStruct
+        {
+            public Color Color { get; set; } // !Color.Transparent
+            public double Posision { get; set; } // 0~1
+        }
+
+        // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
+        public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
+        {
+            Color[] ret = new Color[repert + 1];
+            Color prevCol = Color.Transparent;
+            int prevPos = 0;
+            foreach (var col in cols)
+            {
+                int pos = (int)((repert - 1) * col.Posision);
+                ret[pos] = col.Color;
+                if (prevCol != Color.Transparent)
+                {
+                    int dist = pos - prevPos + 1;
+                    if (dist > 2)
+                    {
+                        for (int graPos = prevPos + 1; graPos < pos; ++graPos)
+                        {
+                            double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
+                            double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
+                            double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
+                            ret[graPos] = new Color(r, g, b);
+                        }
+                    }
+                }
+                prevCol = col.Color;
+                prevPos = pos;
+            }
+            ret[repert] = ret[0];
+            return ret;
         }
 
         public static Task<int[]> Mandelbrot(double xpos, double ypos, double radius, int repert, int resolution)
