@@ -30,6 +30,12 @@ namespace Mandelbrot_Julia_Viewer.Views
             InitializeComponent();
 
             BindingContext = ViewModel;
+            BtnColorParette.Clicked += BtnColorParette_Clicked;
+        }
+
+        private void BtnColorParette_Clicked(object sender, EventArgs e)
+        {
+            ((MasterDetailPage)Parent).Detail = new ColorParettePage(ViewModel);
         }
     }
 }

@@ -22,6 +22,7 @@
                 <Switch IsToggled="{Binding UseColorParette}"/>
                 <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>
                 <Button x:Name="BtnJulia" Text="Julia" Command="{Binding JuliaRun}"/>
+                <Button x:Name="BtnColorParette" Text="ColorParette..."/>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
