@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Mandelbrot_Julia_Viewer.Views.StartPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Menu"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <Button x:Name="BtnUndo" Text="Undo" Command="{Binding Undo}" IsEnabled="{Binding CanUndo}"/>
+                <Button x:Name="BtnRedo" Text="Redo" Command="{Binding Redo}" IsEnabled="{Binding CanRedo}"/>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="XPos" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="EntryXPos" Text="{Binding XPos, Mode=TwoWay}" VerticalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="YPos" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="EntryYPos" Text="{Binding YPos, Mode=TwoWay}" VerticalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Radius" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="EntryRadius" Text="{Binding Radius, Mode=TwoWay}" VerticalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Repert" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="EntryRepert" Text="{Binding Repert, Mode=TwoWay}" VerticalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Resolution" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="EntryResolution" Text="{Binding Resolution, Mode=TwoWay}" VerticalOptions="Center"/>
+                </StackLayout>
+                <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>
+                <Button x:Name="BtnJulia" Text="Julia" Command="{Binding JuliaRun}"/>
+            </StackLayout>
+            <ScrollView Orientation="Both" HorizontalOptions="Center" VerticalOptions="Center">
+                <Image x:Name="ImageView" Source="{Binding ImageSource}"/>
+            </ScrollView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
