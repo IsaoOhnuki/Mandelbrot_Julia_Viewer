@@ -51,9 +51,6 @@
     <Compile Include="Models\MJClass.cs" />
     <Compile Include="Models\UndoList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\StartPage.xaml.cs">
-      <DependentUpon>StartPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\TopPage.xaml.cs">
       <DependentUpon>TopPage.xaml</DependentUpon>
     </Compile>
@@ -70,12 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Views\StartPage.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\TopPage.xaml">

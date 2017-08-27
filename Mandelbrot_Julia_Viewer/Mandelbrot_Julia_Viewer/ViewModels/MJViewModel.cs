@@ -18,6 +18,17 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
         public bool CanUndo { get { return UndoList.CanUndo; } }
         public bool CanRedo { get { return UndoList.CanRedo; } }
         public UndoList<Mandelbrot_Julia> UndoList { get; set; }
+        public string FractalType { get; set; }
+        private Rectangle imageBound;
+        public Rectangle ImageBound
+        {
+            get { return imageBound; }
+            set
+            {
+                imageBound = value;
+                OnPropertyChanged();
+            }
+        }
         private double rate;
         public double Rate
         {
@@ -26,8 +37,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             {
                 rate = value;
                 OnPropertyChanged();
-                ImageWidth = (int)(Rate * (double)Resolution);
-                ImageHeight = (int)(Rate * (double)Resolution);
+                ImageBound = new Rectangle(0, 0, Rate * ImageWidth, Rate * ImageHeight);
             }
         }
         private int imageWidth;
@@ -38,6 +48,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             {
                 imageWidth = value;
                 OnPropertyChanged();
+                ImageBound = new Rectangle(0, 0, Rate * ImageWidth, Rate * ImageHeight);
             }
         }
         private int imageHeight;
@@ -48,6 +59,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             {
                 imageHeight = value;
                 OnPropertyChanged();
+                ImageBound = new Rectangle(0, 0, Rate * ImageWidth, Rate * ImageHeight);
             }
         }
 
@@ -99,7 +111,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             {
                 resolution = value;
                 OnPropertyChanged();
-                Rate = 1;
             }
         }
 
@@ -122,18 +133,20 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             Radius = 2;
             Repert = 63;
             Resolution = 1024;
+            Rate = 1;
+            ImageHeight = 1024;
+            ImageWidth = 1024;
 
             Undo = new Command(async () => {
                 Mandelbrot_Julia mj = UndoList.Undo();
                 byte[] bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                 ImageSource = ImageSource.FromStream(() => new MemoryStream(bmp));
+                FractalType = Double.IsNaN(mj.IPos) ? "MandelbrotSet" : "JuliaSet";
                 XPos = Double.IsNaN(mj.IPos) ? mj.XPos : mj.IPos;
                 YPos = Double.IsNaN(mj.JPos) ? mj.YPos : mj.JPos;
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
-                ImageHeight = mj.Resolution;
-                ImageWidth = mj.Resolution;
                 OnPropertyChanged(nameof(CanUndo));
                 OnPropertyChanged(nameof(CanRedo));
             }, () => UndoList.CanUndo);
@@ -141,13 +154,12 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 Mandelbrot_Julia mj = UndoList.Redo();
                 byte[] bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                 ImageSource = ImageSource.FromStream(() => new MemoryStream(bmp));
+                FractalType = Double.IsNaN(mj.IPos) ? "MandelbrotSet" : "JuliaSet";
                 XPos = Double.IsNaN(mj.IPos) ? mj.XPos : mj.IPos;
                 YPos = Double.IsNaN(mj.JPos) ? mj.YPos : mj.JPos;
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
-                ImageHeight = mj.Resolution;
-                ImageWidth = mj.Resolution;
                 OnPropertyChanged(nameof(CanUndo));
                 OnPropertyChanged(nameof(CanRedo));
             }, () => UndoList.CanRedo);
@@ -161,8 +173,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                     mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
-                    ImageHeight = mj.Resolution;
-                    ImageWidth = mj.Resolution;
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
                 }
@@ -171,6 +181,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                     bmp = await BitmapCreator.Create((short)UndoList.Last.Resolution, (short)UndoList.Last.Resolution, UndoList.Last.Image);
                 }
                 ImageSource = ImageSource.FromStream(() => new MemoryStream(bmp));
+                FractalType = "MandelbrotSet";
             });
             JuliaRun = new Command(async () => {
                 Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, 0, 0, 2, Repert, Resolution);
@@ -181,8 +192,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                     mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
-                    ImageHeight = mj.Resolution;
-                    ImageWidth = mj.Resolution;
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
                 }
@@ -191,6 +200,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                     bmp = await BitmapCreator.Create((short)UndoList.Last.Resolution, (short)UndoList.Last.Resolution, UndoList.Last.Image);
                 }
                 ImageSource = ImageSource.FromStream(() => new MemoryStream(bmp));
+                FractalType = "JuliaSet";
             });
         }
     }
