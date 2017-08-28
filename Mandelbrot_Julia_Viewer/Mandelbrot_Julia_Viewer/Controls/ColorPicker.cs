@@ -28,7 +28,37 @@ namespace Controls
 
         public ColorPicker()
         {
-            ListItems = new ObservableCollection<ColorStruct>(ColorStruct.Colors);
+            ListItems = new ObservableCollection<ColorStruct>(ColorStruct.Colors.Where(x => x.Color != Color.Transparent).Distinct()
+                .OrderByDescending(x => {
+                    if (x.Color.R == x.Color.G && x.Color.G == x.Color.B)
+                        return x.Color.R;
+                    else
+                        return 0;
+                })
+                .ThenByDescending(x => {
+                    if (x.Color.R == 0 && x.Color.G == 0 && x.Color.B == 0)
+                        return 1;
+                    else
+                    {
+                        double max = 0;
+                        double min = 1;
+                        if (max < x.Color.R)
+                            max = x.Color.R;
+                        if (max < x.Color.G)
+                            max = x.Color.G;
+                        if (max < x.Color.B)
+                            max = x.Color.B;
+                        if (min > x.Color.R)
+                            min = x.Color.R;
+                        if (min > x.Color.G)
+                            min = x.Color.G;
+                        if (min > x.Color.B)
+                            min = x.Color.B;
+                        return (double)(max + min) / 2;
+                    }
+                })
+                .ThenBy(x => x.Color.R == 0 && x.Color.G == 0 && x.Color.B == 0 ? 0 : x.Color.Saturation)
+                .ThenBy(x => x.Color.Hue));
 
             ListView listView = new ListView();
             listView.BackgroundColor = Color.CornflowerBlue;
