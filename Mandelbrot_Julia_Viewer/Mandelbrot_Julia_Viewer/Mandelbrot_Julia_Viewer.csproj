@@ -42,9 +42,13 @@
     <Compile Include="Controls\ColorComboBox.xaml.cs">
       <DependentUpon>ColorComboBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ColorPicker.cs" />
     <Compile Include="ViewModels\MJViewModel.cs" />
     <Compile Include="Views\ColorParettePage.xaml.cs">
       <DependentUpon>ColorParettePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ColorSelectPage.xaml.cs">
+      <DependentUpon>ColorSelectPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DrawPage.xaml.cs">
       <DependentUpon>DrawPage.xaml</DependentUpon>
@@ -105,6 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\ColorComboBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\ColorSelectPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

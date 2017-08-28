@@ -17,6 +17,7 @@ namespace Controls
         // http://www.losttechnology.jp/WebDesign/colorlist.html さまざまな色一覧
         // http://matatabi-ux.hateblo.jp/entry/2014/09/26/120000 Xamarin.Forms の View にバインド可能プロパティを追加する
         // http://qiita.com/sukobuto/items/c8a12070324e713828ea Xamarin.Forms で独自コントロールを定義する
+        // https://forums.xamarin.com/discussion/64654/dialog-color-picker ColorPicker
         public ObservableCollection<ColorPlus> ColorEnum { get; set; }
 
         private ColorPlus selectedColorPlus;
