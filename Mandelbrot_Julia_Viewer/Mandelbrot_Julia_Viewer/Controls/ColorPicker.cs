@@ -8,23 +8,13 @@ using Xamarin.Forms;
 
 namespace Controls
 {
-    public class ColorPicker : ContentView
+    public class ColorPicker : View
     {
+        // http://www.atmarkit.co.jp/ait/articles/1610/12/news021.html Xamarin.Forms：プラットフォームに依存する処理を書くには？
+        // https://akira-watson.com/android/spinner-customize.html [Android] Spinner をカスタマイズして画像リストを表示する
+        // http://ticktack.hatenablog.jp/entry/2016/06/11/124751 【Xamarin.Forms】ViewRendererと仲良くなるための簡易チュートリアル
+
         public ObservableCollection<ColorStruct> ListItems { get; set; }
-        //private ColorStruct[] listItems;
-        //public ColorStruct[] ListItems
-        //{
-        //    get { return listItems; }
-        //    set
-        //    {
-        //        listItems = null;
-        //        if (value != null)
-        //        {
-        //            listItems = new ColorStruct[value.GetLength(0)];
-        //            value.CopyTo(listItems, 0);
-        //        }
-        //    }
-        //}
 
         public ColorPicker()
         {
@@ -59,35 +49,45 @@ namespace Controls
                 })
                 .ThenBy(x => x.Color.R == 0 && x.Color.G == 0 && x.Color.B == 0 ? 0 : x.Color.Saturation)
                 .ThenBy(x => x.Color.Hue));
-
-            ListView listView = new ListView();
-            listView.BackgroundColor = Color.CornflowerBlue;
-            listView.ItemTemplate = new DataTemplate(typeof(ListCell));
-            listView.ItemsSource = ListItems;
-            Content = listView;
         }
 
-        // http://furuya02.hatenablog.com/entry/2014/08/08/003036 Xamarin.Forms ListViewでTwitter風のレイアウトを作成してみました（機種依存コードなし）
-        [Preserve(Conditional = true)]
-        private class ListCell : ViewCell
+        // BindablePropertyを追加
+        public static readonly BindableProperty SelectedColorProperty = BindableProperty.Create(
+            nameof(SelectedColor),
+            typeof(Color),
+            typeof(ColorPicker),
+            default(Color),
+            propertyChanged: (bindable, oldValue, newValue) => {
+                ((ColorPicker)bindable).SelectedColor = (Color)newValue;
+            });
+
+        public Color SelectedColor
         {
-            public ListCell()
-            {
-                //BoxView boxView = new BoxView();
-                //boxView.SetBinding(BoxView.ColorProperty, "Color");
-                Label label = new Label();
-                label.HorizontalOptions = LayoutOptions.FillAndExpand;
-                label.SetBinding(Label.TextProperty, "Name");
-                label.SetBinding(Label.TextColorProperty, "Foreground");
-                label.SetBinding(Label.BackgroundColorProperty, "Color");
-                View = label;
-            }
+            get { return (Color)GetValue(SelectedColorProperty); }
+            set { SetValue(SelectedColorProperty, value); }
         }
 
-        class PreserveAttribute : System.Attribute
-        {
-            public bool Conditional { get; set; }
-        }
+        //// http://furuya02.hatenablog.com/entry/2014/08/08/003036 Xamarin.Forms ListViewでTwitter風のレイアウトを作成してみました（機種依存コードなし）
+        //[Preserve(Conditional = true)]
+        //private class ListCell : ViewCell
+        //{
+        //    public ListCell()
+        //    {
+        //        //BoxView boxView = new BoxView();
+        //        //boxView.SetBinding(BoxView.ColorProperty, "Color");
+        //        Label label = new Label();
+        //        label.HorizontalOptions = LayoutOptions.FillAndExpand;
+        //        label.SetBinding(Label.TextProperty, "Name");
+        //        label.SetBinding(Label.TextColorProperty, "Foreground");
+        //        label.SetBinding(Label.BackgroundColorProperty, "Color");
+        //        View = label;
+        //    }
+        //}
+
+        //class PreserveAttribute : System.Attribute
+        //{
+        //    public bool Conditional { get; set; }
+        //}
     }
 
     public class ColorStruct

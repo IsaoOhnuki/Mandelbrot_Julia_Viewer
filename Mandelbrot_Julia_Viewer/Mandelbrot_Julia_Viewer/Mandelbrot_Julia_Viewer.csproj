@@ -43,6 +43,7 @@
       <DependentUpon>ColorComboBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ColorPicker.cs" />
+    <Compile Include="Controls\ColorPickerDependencyService.cs" />
     <Compile Include="ViewModels\MJViewModel.cs" />
     <Compile Include="Views\ColorParettePage.xaml.cs">
       <DependentUpon>ColorParettePage.xaml</DependentUpon>
