@@ -31,15 +31,20 @@ namespace Mandelbrot_Julia_Viewer.Views
 
                     foreach (var parette in ColorParette)
                     {
-                        var layout = new StackLayout();
-                        layout.Orientation = StackOrientation.Horizontal;
+                        var layout = new Grid();
+                        layout.ColumnDefinitions = new ColumnDefinitionCollection();
+                        layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6, GridUnitType.Star) });
+                        layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                         layout.BackgroundColor = Color.DarkKhaki;
                         layout.HorizontalOptions = LayoutOptions.FillAndExpand;
                         var slider = new Slider();
                         slider.Value = parette.Posision;
                         slider.HorizontalOptions = LayoutOptions.FillAndExpand;
+                        slider.SetValue(Grid.ColumnProperty, 0);
                         layout.Children.Add(slider);
                         var colsel = new ColorPicker();
+                        colsel.SelectedColor = parette.Color;
+                        colsel.SetValue(Grid.ColumnProperty, 1);
                         layout.Children.Add(colsel);
                         StackLayout.Children.Add(layout);
                     }

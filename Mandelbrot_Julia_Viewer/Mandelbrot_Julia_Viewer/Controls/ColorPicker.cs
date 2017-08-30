@@ -95,7 +95,7 @@ namespace Controls
     {
         public Color Color { get; set; }
         public string Name { get; set; }
-        public string Color16Str { get { return "#" + ((int)(255 * Color.B)).ToString("x2") + ((int)(255 * Color.G)).ToString("x2") + ((int)(255 * Color.R)).ToString("x2"); } }
+        public string Color16Str { get { return "#" + ((int)(255 * Color.A)).ToString("x2") + ((int)(255 * Color.R)).ToString("x2") + ((int)(255 * Color.G)).ToString("x2") + ((int)(255 * Color.B)).ToString("x2"); } }
         public override bool Equals(object obj)
         {
             ColorStruct v = obj as ColorStruct;
