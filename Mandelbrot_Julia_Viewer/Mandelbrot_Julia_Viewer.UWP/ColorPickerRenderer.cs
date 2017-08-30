@@ -8,6 +8,8 @@ using Windows.UI.Xaml.Controls;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.UWP;
 using System.ComponentModel;
+using Windows.UI.Xaml.Markup;
+using System.Xml;
 
 [assembly: ExportRenderer(typeof(ColorPicker), typeof(Mandelbrot_Julia_Viewer.UWP.ColorPickerRenderer))]
 namespace Mandelbrot_Julia_Viewer.UWP
@@ -20,10 +22,24 @@ namespace Mandelbrot_Julia_Viewer.UWP
             if (Control == null)
             {
                 var ctrl = new ComboBox();
+
+                //var tmp = Application.Current.Resources["ColorPickerItemTemplate"];
+                var tmp = Windows.UI.Xaml.Markup.XamlReader.Load(
+                    @"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
+                        <Grid Background=""{Binding Color16Str}"">
+                            <!--<LinearGradientBrush EndPoint=""1, 0.5"" StartPoint=""0, 0.5"">
+                                <GradientStop Color=""#FFFFFFFF""/>
+                                <GradientStop Color=""{Binding Color16Str}"" Offset=""1""/>
+                            </LinearGradientBrush>-->
+                            <!--<Grid.Background>
+                                <SolidColorBrush Color=""{Binding Color}""/>
+                            </Grid.Background>-->
+                            <TextBlock Text=""{Binding Name}""/>
+                        </Grid>
+                    </DataTemplate>");
+
+                ctrl.ItemTemplate = tmp as Windows.UI.Xaml.DataTemplate;
                 SetNativeControl(ctrl);
-                var tmp = new Windows.UI.Xaml.DataTemplate();
-                var factory = new FrameworkElementFactory(typeof(Label));
-                Control.ItemTemplate = tmp;
             }
             if (e.NewElement != null)
             {

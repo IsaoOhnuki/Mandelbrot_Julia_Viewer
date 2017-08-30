@@ -13,6 +13,7 @@ namespace Controls
         // http://www.atmarkit.co.jp/ait/articles/1610/12/news021.html Xamarin.Forms：プラットフォームに依存する処理を書くには？
         // https://akira-watson.com/android/spinner-customize.html [Android] Spinner をカスタマイズして画像リストを表示する
         // http://ticktack.hatenablog.jp/entry/2016/06/11/124751 【Xamarin.Forms】ViewRendererと仲良くなるための簡易チュートリアル
+        // http://qiita.com/yakumomo/items/74be7508b300196c6894 Xamarin無償化をよそにXamarin.FormsビューとUWPネイティブビューの融合の話
 
         public ObservableCollection<ColorStruct> ListItems { get; set; }
 
@@ -94,6 +95,7 @@ namespace Controls
     {
         public Color Color { get; set; }
         public string Name { get; set; }
+        public string Color16Str { get { return "#" + ((int)(255 * Color.B)).ToString("x2") + ((int)(255 * Color.G)).ToString("x2") + ((int)(255 * Color.R)).ToString("x2"); } }
         public override bool Equals(object obj)
         {
             ColorStruct v = obj as ColorStruct;

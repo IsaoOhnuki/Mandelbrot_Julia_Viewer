@@ -39,21 +39,12 @@ namespace Mandelbrot_Julia_Viewer.Views
                         slider.Value = parette.Posision;
                         slider.HorizontalOptions = LayoutOptions.FillAndExpand;
                         layout.Children.Add(slider);
-                        var colsel = new ColorComboBox();
+                        var colsel = new ColorPicker();
                         layout.Children.Add(colsel);
-                        var button = new Button();
-                        button.Text = "Color";
-                        button.Clicked += Button_Clicked;
-                        layout.Children.Add(button);
                         StackLayout.Children.Add(layout);
                     }
                 }
             }
-        }
-
-        private void Button_Clicked(object sender, EventArgs e)
-        {
-            ((MasterDetailPage)Parent).Detail = new ColorSelectPage();
         }
 
         public ColorParettePage()
