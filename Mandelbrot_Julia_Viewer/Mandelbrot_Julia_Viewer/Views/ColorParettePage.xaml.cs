@@ -55,6 +55,7 @@ namespace Mandelbrot_Julia_Viewer.Views
         public ColorParettePage()
         {
             InitializeComponent();
+            ToolbarItems.Add(new ToolbarItem("<", "", () => { }, ToolbarItemOrder.Default));
         }
         public ColorParettePage(MJViewModel viewModel)
         {
@@ -62,6 +63,7 @@ namespace Mandelbrot_Julia_Viewer.Views
 
             this.BindingContext = viewModel;
             ColorParette = viewModel.ColorParette;
+            ToolbarItems.Add(new ToolbarItem("←", "", () => { ((MasterDetailPage)Parent).Detail = new DrawPage(viewModel); }, ToolbarItemOrder.Default));
         }
     }
 }

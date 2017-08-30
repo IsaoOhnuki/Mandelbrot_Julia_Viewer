@@ -23,6 +23,7 @@
                 <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>
                 <Button x:Name="BtnJulia" Text="Julia" Command="{Binding JuliaRun}"/>
                 <Button x:Name="BtnColorParette" Text="ColorParette..."/>
+                <Button x:Name="BtnImage" Text="Image..."/>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
