@@ -26,23 +26,26 @@ namespace Mandelbrot_Julia_Viewer.Views
                 colorParette = null;
                 if (value != null)
                 {
-                    colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
-                    value.CopyTo(colorParette, 0);
+                    colorParette = value;
+                    //colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
+                    //value.CopyTo(colorParette, 0);
 
                     foreach (var parette in ColorParette)
                     {
                         var layout = new Grid();
+                        layout.BindingContext = parette;
                         layout.ColumnDefinitions = new ColumnDefinitionCollection();
                         layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6, GridUnitType.Star) });
                         layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                         layout.BackgroundColor = Color.DarkKhaki;
                         layout.HorizontalOptions = LayoutOptions.FillAndExpand;
                         var slider = new Slider();
-                        slider.Value = parette.Posision;
+                        slider.SetBinding(Slider.ValueProperty, new Binding("Posision", BindingMode.TwoWay));
                         slider.HorizontalOptions = LayoutOptions.FillAndExpand;
                         slider.SetValue(Grid.ColumnProperty, 0);
                         layout.Children.Add(slider);
                         var colsel = new ColorPicker();
+                        colsel.SetBinding(ColorPicker.SelectedColorProperty, new Binding("Color", BindingMode.TwoWay));
                         colsel.SelectedColor = parette.Color;
                         colsel.SetValue(Grid.ColumnProperty, 1);
                         layout.Children.Add(colsel);
@@ -61,7 +64,6 @@ namespace Mandelbrot_Julia_Viewer.Views
         {
             InitializeComponent();
 
-            this.BindingContext = viewModel;
             ColorParette = viewModel.ColorParette;
             ToolbarItems.Add(new ToolbarItem("←", "", () => { ((MasterDetailPage)Parent).Detail = new DrawPage(viewModel); }, ToolbarItemOrder.Default));
         }

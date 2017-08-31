@@ -19,7 +19,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
     {
         protected override void OnElementChanged(ElementChangedEventArgs<ColorPicker> e)
         {
-            if (Control == null)
+            if (Control == null && e.NewElement != null)
             {
                 var ctrl = new ComboBox();
 
@@ -43,11 +43,11 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 ctrl.ItemTemplate = tmp as Windows.UI.Xaml.DataTemplate;
                 SetNativeControl(ctrl);
             }
-            if (e.OldElement != null)
+            if (Control != null && e.OldElement != null)
             {
                 Control.SelectionChanged -= Control_SelectionChanged;
             }
-            if (e.NewElement != null)
+            if (Control != null && e.NewElement != null)
             {
                 Control.ItemsSource = e.NewElement.ListItems;
                 Control.SelectedItem = (Control.ItemsSource as IEnumerable<ColorStruct>)?.Where(x => x.Color == e.NewElement.SelectedColor).SingleOrDefault();

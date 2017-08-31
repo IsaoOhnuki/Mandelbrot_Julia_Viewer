@@ -1,6 +1,7 @@
 ﻿using Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -35,12 +36,13 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             get { return colorParette; }
             set
             {
-                colorParette = null;
-                if (value != null)
-                {
-                    colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
-                    value.CopyTo(colorParette, 0);
-                }
+                colorParette = value;
+                //colorParette = null;
+                //if (value != null)
+                //{
+                //    colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
+                //    value.CopyTo(colorParette, 0);
+                //}
             }
         }
         private Rectangle imageBound;
@@ -147,6 +149,11 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 imageSource = value;
                 OnPropertyChanged();
             }
+        }
+
+        public void ColorResolutionChanged(object sender, PropertyChangedEventArgs e)
+        {
+
         }
 
         public MJViewModel()

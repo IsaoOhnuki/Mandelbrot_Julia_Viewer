@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -139,10 +140,10 @@ namespace Models
             });
         }
 
-        public struct ColorResolutionStruct
+        public class ColorResolutionStruct
         {
-            public Color Color { get; set; } // !Color.Transparent
-            public double Posision { get; set; } // 0~1
+            public Color Color { get; set; }
+            public double Posision { get; set; }
         }
 
         // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
