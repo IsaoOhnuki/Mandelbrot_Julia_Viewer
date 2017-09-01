@@ -51,7 +51,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
             }
             if (Control != null && e.NewElement != null)
             {
-                Control.Adapter = new ArrayAdapter<ColorStruct>(this.Context, 0, e.NewElement.ListItems);
+                //Control.Adapter = new ArrayAdapter<ColorStruct>(this.Context, 0, e.NewElement.ListItems);
                 Control.SetSelection(e.NewElement.ListItems.IndexOf((e.NewElement.ListItems as IEnumerable<ColorStruct>)?.Where(x => x.Color == e.NewElement.SelectedColor).SingleOrDefault()));
                 Control.ItemSelected += Control_ItemSelected;
             }
