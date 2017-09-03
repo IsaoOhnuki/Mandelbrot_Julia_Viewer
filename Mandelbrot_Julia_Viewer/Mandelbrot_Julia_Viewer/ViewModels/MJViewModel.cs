@@ -36,13 +36,13 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             get { return colorParette; }
             set
             {
-                colorParette = value;
-                //colorParette = null;
-                //if (value != null)
-                //{
-                //    colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
-                //    value.CopyTo(colorParette, 0);
-                //}
+                //colorParette = value;
+                colorParette = null;
+                if (value != null)
+                {
+                    colorParette = new Mandelbrot_Julia.ColorResolutionStruct[value.GetLength(0)];
+                    value.CopyTo(colorParette, 0);
+                }
             }
         }
         private Rectangle imageBound;
@@ -186,7 +186,8 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
-                UseColorParette = mj.ColorParette > 0;
+                UseColorParette = mj.ParetteType > 0;
+                ColorParette = mj.ColorParette.ColorResolutions;
                 OnPropertyChanged(nameof(CanUndo));
                 OnPropertyChanged(nameof(CanRedo));
             }, () => UndoList.CanUndo);
@@ -200,18 +201,19 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
-                UseColorParette = mj.ColorParette > 0;
+                UseColorParette = mj.ParetteType > 0;
+                ColorParette = mj.ColorParette.ColorResolutions;
                 OnPropertyChanged(nameof(CanUndo));
                 OnPropertyChanged(nameof(CanRedo));
             }, () => UndoList.CanRedo);
 
             MandelbrotRun = new Command(async () => {
-                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, Radius, Repert, Resolution, UseColorParette ? 1 : 0);
+                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, Radius, Repert, Resolution, UseColorParette ? 1 : 0, ColorParette);
                 byte[] bmp;
                 if (!UndoList.HasLast || UndoList.Last != mj)
                 {
                     mj.Data = await Mandelbrot_Julia.Mandelbrot(mj.XPos, mj.YPos, mj.Radius, mj.Repert, mj.Resolution);
-                    mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ColorParette > 0 ? Mandelbrot_Julia.ColorResolution(mj.Repert, ColorParette) : null);
+                    mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ParetteType > 0 ? mj.ColorParette : null);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
                     OnPropertyChanged(nameof(CanUndo));
@@ -225,12 +227,12 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 FractalType = "MandelbrotSet";
             });
             JuliaRun = new Command(async () => {
-                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, 0, 0, 2, Repert, Resolution, UseColorParette ? 1 : 0);
+                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, 0, 0, 2, Repert, Resolution, UseColorParette ? 1 : 0, ColorParette);
                 byte[] bmp;
                 if (!UndoList.HasLast || UndoList.Last != mj)
                 {
                     mj.Data = await Mandelbrot_Julia.Julia(mj.IPos, mj.JPos, mj.XPos, mj.YPos, mj.Radius, mj.Repert, mj.Resolution);
-                    mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ColorParette > 0 ? Mandelbrot_Julia.ColorResolution(mj.Repert, ColorParette) : null);
+                    mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ParetteType > 0 ? mj.ColorParette: null);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
                     OnPropertyChanged(nameof(CanUndo));

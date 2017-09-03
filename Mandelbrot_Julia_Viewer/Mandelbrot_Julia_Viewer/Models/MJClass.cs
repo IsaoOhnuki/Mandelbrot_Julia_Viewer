@@ -17,7 +17,8 @@ namespace Models
         public double Radius { get; set; }
         public int Repert { get; set; }
         public int Resolution { get; set; }
-        public int ColorParette { get; set; }
+        public int ParetteType { get; set; }
+        public Parette ColorParette { get; set; }
         private int[] data;
         public int[] Data
         {
@@ -55,11 +56,12 @@ namespace Models
             Radius = mj.Radius;
             Repert = mj.Repert;
             Resolution = mj.Resolution;
+            ParetteType = mj.ParetteType;
             ColorParette = mj.ColorParette;
             Data = mj.Data;
             Image = mj.Image;
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int colorParette)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int colorParette, ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -68,9 +70,10 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
-            ColorParette = colorParette;
+            ParetteType = colorParette;
+            ColorParette = new Parette(repert, colors);
         }
-        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, int colorParette)
+        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, int colorParette, ColorResolutionStruct[] colors)
         {
             IPos = ipos;
             JPos = jpos;
@@ -79,7 +82,8 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
-            ColorParette = colorParette;
+            ParetteType = colorParette;
+            ColorParette = new Parette(repert, colors);
         }
 
         public static bool operator ==(Mandelbrot_Julia l, Mandelbrot_Julia r)
@@ -101,6 +105,7 @@ namespace Models
                 && (Double.IsNaN(Radius) ? Double.IsNaN(((Mandelbrot_Julia)obj).Radius) : Radius == ((Mandelbrot_Julia)obj).Radius)
                 && Repert == ((Mandelbrot_Julia)obj).Repert
                 && Resolution == ((Mandelbrot_Julia)obj).Resolution
+                && ParetteType == ((Mandelbrot_Julia)obj).ParetteType
                 && ColorParette == ((Mandelbrot_Julia)obj).ColorParette;
         }
 
@@ -146,36 +151,127 @@ namespace Models
             public double Posision { get; set; }
         }
 
-        // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
-        public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
+        public class Parette
         {
-            Color[] ret = new Color[repert + 1];
-            Color prevCol = Color.Transparent;
-            int prevPos = 0;
-            foreach (var col in cols)
+            public ColorResolutionStruct[] ColorResolutions { get; set; }
+            public Color[] Colors { get; set; }
+            public Parette(Parette parette)
             {
-                int pos = (int)((repert - 1) * col.Posision);
-                ret[pos] = col.Color;
-                if (prevCol != Color.Transparent)
+                if (parette as object == null || parette.Colors == null)
+                    return;
+                Colors = new Color[parette.Colors.GetLength(0)];
+                parette.Colors.CopyTo(Colors, 0);
+                ColorResolutions = new ColorResolutionStruct[parette.ColorResolutions.GetLength(0)];
+                parette.ColorResolutions.CopyTo(ColorResolutions, 0);
+            }
+            public Parette(int repert, ColorResolutionStruct[] colorResolutions)
+            {
+                if (colorResolutions as object == null)
+                    return;
+                Colors = ColorResolution(repert, colorResolutions);
+                ColorResolutions = new ColorResolutionStruct[colorResolutions.GetLength(0)];
+                colorResolutions.CopyTo(ColorResolutions, 0);
+            }
+            public static implicit operator Color[](Parette parette)
+            {
+                if (parette as object == null || parette.Colors == null)
+                    return null;
+                Color[] ret = new Color[parette.Colors.GetLength(0)];
+                parette.Colors.CopyTo(ret, 0);
+                return ret;
+            }
+            // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
+            public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
+            {
+                Color[] ret = new Color[repert + 1];
+                Color prevCol = Color.Transparent;
+                int prevPos = 0;
+                foreach (var col in cols)
                 {
-                    int dist = pos - prevPos + 1;
-                    if (dist > 2)
+                    int pos = (int)((repert - 1) * col.Posision);
+                    ret[pos] = col.Color;
+                    if (prevCol != Color.Transparent)
                     {
-                        for (int graPos = prevPos + 1; graPos < pos; ++graPos)
+                        int dist = pos - prevPos + 1;
+                        if (dist > 2)
                         {
-                            double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
-                            double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
-                            double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
-                            ret[graPos] = new Color(r, g, b);
+                            for (int graPos = prevPos + 1; graPos < pos; ++graPos)
+                            {
+                                double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
+                                double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
+                                double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
+                                ret[graPos] = new Color(r, g, b);
+                            }
                         }
                     }
+                    prevCol = col.Color;
+                    prevPos = pos;
                 }
-                prevCol = col.Color;
-                prevPos = pos;
+                ret[repert] = ret[0];
+                return ret;
             }
-            ret[repert] = ret[0];
-            return ret;
+            public static bool operator ==(Parette l, Parette r)
+            {
+                if (l as object == null || r as object == null || l.Colors == null || r.Colors == null)
+                    return false;
+                bool ret = l.Colors.GetLength(0) == r.Colors.GetLength(0);
+                for (int idx = 0; ret && idx < l.Colors.GetLength(0); ++idx)
+                {
+                    ret = l.Colors[idx] == r.Colors[idx];
+                }
+                return ret;
+            }
+            public static bool operator !=(Parette l, Parette r)
+            {
+                if (l as object == null || r as object == null || l.Colors == null || r.Colors == null)
+                    return true;
+                bool ret = l.Colors.GetLength(0) != r.Colors.GetLength(0);
+                for (int idx = 0; !ret && idx < l.Colors.GetLength(0); ++idx)
+                {
+                    ret = l.Colors[idx] != r.Colors[idx];
+                }
+                return ret;
+            }
+            public override bool Equals(object obj)
+            {
+                return this == obj as Parette;
+            }
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
+
+        //// http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
+        //public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
+        //{
+        //    Color[] ret = new Color[repert + 1];
+        //    Color prevCol = Color.Transparent;
+        //    int prevPos = 0;
+        //    foreach (var col in cols)
+        //    {
+        //        int pos = (int)((repert - 1) * col.Posision);
+        //        ret[pos] = col.Color;
+        //        if (prevCol != Color.Transparent)
+        //        {
+        //            int dist = pos - prevPos + 1;
+        //            if (dist > 2)
+        //            {
+        //                for (int graPos = prevPos + 1; graPos < pos; ++graPos)
+        //                {
+        //                    double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
+        //                    double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
+        //                    double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
+        //                    ret[graPos] = new Color(r, g, b);
+        //                }
+        //            }
+        //        }
+        //        prevCol = col.Color;
+        //        prevPos = pos;
+        //    }
+        //    ret[repert] = ret[0];
+        //    return ret;
+        //}
 
         public static Task<int[]> Mandelbrot(double xpos, double ypos, double radius, int repert, int resolution)
         {
