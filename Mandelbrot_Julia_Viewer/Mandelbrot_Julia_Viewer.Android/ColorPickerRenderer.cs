@@ -76,6 +76,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
             Android.Views.View item = inflater.Inflate(Resource.Layout.ColorPickerItemlayout, parent, false);
             TextView label = item.FindViewById<TextView>(Resource.Id.ColorPickerItemText);
             label.Text = GetItem(position).Name;
+            label.SetTextColor(new Android.Graphics.Color(0, 0, 0));
             label.SetBackgroundColor(new Android.Graphics.Color(GetItem(position).ColorInt));
             return item;
         }
