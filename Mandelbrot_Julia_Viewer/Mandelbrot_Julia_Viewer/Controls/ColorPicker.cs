@@ -96,6 +96,7 @@ namespace Controls
         public Color Color { get; set; }
         public string Name { get; set; }
         public string Color16Str { get { return "#" + ((int)(255 * Color.A)).ToString("x2") + ((int)(255 * Color.R)).ToString("x2") + ((int)(255 * Color.G)).ToString("x2") + ((int)(255 * Color.B)).ToString("x2"); } }
+        public int ColorInt { get { return (((int)(255 * Color.A)) << 24) + (((int)(255 * Color.R)) << 16) + (((int)(255 * Color.G)) << 8) + ((int)(255 * Color.B)); } }
         public override bool Equals(object obj)
         {
             ColorStruct v = obj as ColorStruct;
@@ -105,7 +106,10 @@ namespace Controls
         {
             return Color.GetHashCode();
         }
-
+        public override string ToString()
+        {
+            return Name;
+        }
         public static ColorStruct[] Colors
         {
             get

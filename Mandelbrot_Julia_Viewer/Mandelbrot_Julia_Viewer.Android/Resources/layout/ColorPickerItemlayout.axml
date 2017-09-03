@@ -4,11 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minWidth="25px"
-    android:minHeight="25px">
+    android:minHeight="25px"
+    android:id="@+id/ColorPickerItem">
     <TextView
-        android:text="Medium Text"
+        android:text="Medium Text5"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/textView1" />
+        android:id="@+id/ColorPickerItemText"
+        android:background="@color/design_textinput_error_color_dark" />
 </LinearLayout>
