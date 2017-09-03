@@ -18,6 +18,7 @@ using Xamarin.Forms.Platform.Android;
 namespace Mandelbrot_Julia_Viewer.Droid
 {
     // http://santea.hateblo.jp/entry/2016/08/19/163020 Custom Renderer で CardView を作ってみた
+    // http://qiita.com/Helmos/items/6b65d40d355379dc7ffa Key, Valueの値を持ったSpinnerを作る(XMLから読み込む)
 
     class ColorPickerRenderer : ViewRenderer<ColorPicker, Spinner>
     {
