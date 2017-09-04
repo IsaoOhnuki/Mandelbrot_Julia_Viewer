@@ -148,7 +148,7 @@ namespace Models
         public class ColorResolutionStruct
         {
             public Color Color { get; set; }
-            public double Posision { get; set; }
+            public double Position { get; set; }
         }
 
         public class Parette
@@ -183,12 +183,28 @@ namespace Models
             // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
             public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
             {
+                for (int arrayidx = 0; arrayidx < repert; ++arrayidx)
+                {
+                    double pos = (double)arrayidx / (repert - 1);
+                    int prevcolpos = 0;
+                    for (int colpos = 1; colpos < cols.Count(); ++colpos)
+                    {
+                        if (pos > cols[prevcolpos].Position && pos <= cols[colpos].Position)
+                        {
+
+                        }
+                    }
+                }
+
+
+
+
                 Color[] ret = new Color[repert + 1];
                 Color prevCol = Color.Transparent;
                 int prevPos = 0;
                 foreach (var col in cols)
                 {
-                    int pos = (int)((repert - 1) * col.Posision);
+                    int pos = (int)((repert - 1) * col.Position);
                     ret[pos] = col.Color;
                     if (prevCol != Color.Transparent)
                     {

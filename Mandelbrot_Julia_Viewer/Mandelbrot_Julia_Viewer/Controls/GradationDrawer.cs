@@ -40,6 +40,20 @@ namespace Controls
 
         public Color[] CreateColorArray(int arraySize)
         {
+            for (int arrayidx = 0; arrayidx < arraySize; ++arrayidx)
+            {
+                double pos = (double)arrayidx / arraySize;
+                int prevcolpos = 0;
+                for (int colpos = 1; colpos < Colors.Count; ++colpos)
+                {
+                    if (pos > Colors[prevcolpos].Position && pos <= Colors[colpos].Position)
+                    {
+
+                    }
+                }
+            }
+
+
             Color[] ret = new Color[arraySize + 1];
             Color prevCol = Color.Transparent;
             int prevPos = 0;

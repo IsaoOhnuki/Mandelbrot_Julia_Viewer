@@ -170,11 +170,11 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             ImageWidth = 1024;
 
             ColorParette = new Mandelbrot_Julia.ColorResolutionStruct[] {
-                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Black, Posision = 0 },
-                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Red, Posision = 0.15 },
-                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.DarkViolet, Posision = 0.3 },
-                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Blue, Posision = 0.6 },
-                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.White, Posision = 1 }
+                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Black, Position = 0 },
+                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Red, Position = 0.15 },
+                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.DarkViolet, Position = 0.3 },
+                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.Blue, Position = 0.6 },
+                            new Mandelbrot_Julia.ColorResolutionStruct{ Color = Color.White, Position = 1 }
                         };
 
             Undo = new Command(async () => {
