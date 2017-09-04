@@ -10,6 +10,7 @@ using Xamarin.Forms;
 
 namespace Mandelbrot_Julia_Viewer.ViewModels
 {
+    // http://garicchi.com/?p=16481 プリンターを使って印刷するには
     public class MJViewModel : BindableObject
     {
         public Command MandelbrotRun { get; set; }
