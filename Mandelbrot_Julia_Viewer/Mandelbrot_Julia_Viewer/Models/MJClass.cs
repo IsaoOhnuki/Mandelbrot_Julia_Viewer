@@ -183,6 +183,7 @@ namespace Models
             // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
             public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
             {
+                Color[] ret = new Color[repert + 1];
                 for (int arrayidx = 0; arrayidx < repert; ++arrayidx)
                 {
                     double pos = (double)arrayidx / (repert - 1);
@@ -191,37 +192,13 @@ namespace Models
                     {
                         if (pos > cols[prevcolpos].Position && pos <= cols[colpos].Position)
                         {
-
+                            double r = (cols[colpos].Color.R - cols[prevcolpos].Color.R) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.R;
+                            double g = (cols[colpos].Color.G - cols[prevcolpos].Color.G) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.G;
+                            double b = (cols[colpos].Color.B - cols[prevcolpos].Color.B) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.B;
+                            ret[arrayidx] = new Color(r, g, b);
+                            break;
                         }
                     }
-                }
-
-
-
-
-                Color[] ret = new Color[repert + 1];
-                Color prevCol = Color.Transparent;
-                int prevPos = 0;
-                foreach (var col in cols)
-                {
-                    int pos = (int)((repert - 1) * col.Position);
-                    ret[pos] = col.Color;
-                    if (prevCol != Color.Transparent)
-                    {
-                        int dist = pos - prevPos + 1;
-                        if (dist > 2)
-                        {
-                            for (int graPos = prevPos + 1; graPos < pos; ++graPos)
-                            {
-                                double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
-                                double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
-                                double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
-                                ret[graPos] = new Color(r, g, b);
-                            }
-                        }
-                    }
-                    prevCol = col.Color;
-                    prevPos = pos;
                 }
                 ret[repert] = ret[0];
                 return ret;

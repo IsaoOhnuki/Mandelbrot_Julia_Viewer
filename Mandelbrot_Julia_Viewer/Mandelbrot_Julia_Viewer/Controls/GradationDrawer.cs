@@ -40,6 +40,7 @@ namespace Controls
 
         public Color[] CreateColorArray(int arraySize)
         {
+            Color[] ret = new Color[arraySize + 1];
             for (int arrayidx = 0; arrayidx < arraySize; ++arrayidx)
             {
                 double pos = (double)arrayidx / arraySize;
@@ -48,35 +49,13 @@ namespace Controls
                 {
                     if (pos > Colors[prevcolpos].Position && pos <= Colors[colpos].Position)
                     {
-
+                        double r = (Colors[colpos].Color.R - Colors[prevcolpos].Color.R) * pos / (Colors[colpos].Position - Colors[prevcolpos].Position) + Colors[prevcolpos].Color.R;
+                        double g = (Colors[colpos].Color.G - Colors[prevcolpos].Color.G) * pos / (Colors[colpos].Position - Colors[prevcolpos].Position) + Colors[prevcolpos].Color.G;
+                        double b = (Colors[colpos].Color.B - Colors[prevcolpos].Color.B) * pos / (Colors[colpos].Position - Colors[prevcolpos].Position) + Colors[prevcolpos].Color.B;
+                        ret[arrayidx] = new Color(r, g, b);
+                        break;
                     }
                 }
-            }
-
-
-            Color[] ret = new Color[arraySize + 1];
-            Color prevCol = Color.Transparent;
-            int prevPos = 0;
-            foreach (var col in Colors)
-            {
-                int pos = (int)((arraySize - 1) * col.Position);
-                ret[pos] = col.Color;
-                if (prevCol != Color.Transparent)
-                {
-                    int dist = pos - prevPos + 1;
-                    if (dist > 2)
-                    {
-                        for (int graPos = prevPos + 1; graPos < pos; ++graPos)
-                        {
-                            double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
-                            double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
-                            double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
-                            ret[graPos] = new Color(r, g, b);
-                        }
-                    }
-                }
-                prevCol = col.Color;
-                prevPos = pos;
             }
             return ret;
         }
