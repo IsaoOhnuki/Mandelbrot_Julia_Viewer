@@ -52,6 +52,8 @@ namespace Controls
                 .ThenBy(x => x.Color.Hue));
         }
 
+        public event EventHandler<ColorChangedEventArgs> ColorChanged;
+
         // BindablePropertyを追加
         public static readonly BindableProperty SelectedColorProperty = BindableProperty.Create(
             nameof(SelectedColor),
@@ -60,6 +62,7 @@ namespace Controls
             default(Color),
             propertyChanged: (bindable, oldValue, newValue) => {
                 ((ColorPicker)bindable).SelectedColor = (Color)newValue;
+                ((ColorPicker)bindable).ColorChanged?.Invoke(bindable, new ColorChangedEventArgs((Color)oldValue, (Color)newValue));
             });
 
         public Color SelectedColor
@@ -89,6 +92,17 @@ namespace Controls
         //{
         //    public bool Conditional { get; set; }
         //}
+    }
+
+    public class ColorChangedEventArgs : EventArgs
+    {
+        public ColorChangedEventArgs(Color oldValue, Color newValue)
+        {
+            OldValue = oldValue;
+            NewValue = newValue;
+        }
+        public Color NewValue { get; private set; }
+        public Color OldValue { get; private set; }
     }
 
     public class ColorStruct
