@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Mandelbrot_Julia_Viewer.Views.ColorParettePage">
     <ContentPage.Content>
-        <StackLayout x:Name="StackLayout" HorizontalOptions="FillAndExpand" BackgroundColor="Red">
+        <StackLayout Orientation="Vertical">
+            <StackLayout x:Name="StackLayout" HorizontalOptions="FillAndExpand" BackgroundColor="Red">
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

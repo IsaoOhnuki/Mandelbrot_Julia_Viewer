@@ -21,12 +21,12 @@ namespace Mandelbrot_Julia_Viewer.Views
         public ObservableCollection<Mandelbrot_Julia.ColorResolutionStruct> Parette { get; set; }
         public Mandelbrot_Julia.ColorResolutionStruct[] ColorParette
         {
-            get { return Parette.ToArray(); }
+            get { return Parette.Select(x => new Mandelbrot_Julia.ColorResolutionStruct { Color = x.Color, Position = x.Position / 100 }).ToArray(); }
             set
             {
                 Parette.Clear();
                 foreach (var val in value)
-                    Parette.Add(val);
+                    Parette.Add(new Mandelbrot_Julia.ColorResolutionStruct { Color = val.Color, Position = val.Position * 100 });
             }
         }
 
@@ -37,23 +37,7 @@ namespace Mandelbrot_Julia_Viewer.Views
                 int insertIndex = e.NewStartingIndex;
                 foreach (var parette in e.NewItems)
                 {
-                    var layout = new Grid();
-                    layout.BindingContext = parette;
-                    layout.ColumnDefinitions = new ColumnDefinitionCollection();
-                    layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6, GridUnitType.Star) });
-                    layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                    layout.BackgroundColor = Color.DarkKhaki;
-                    layout.HorizontalOptions = LayoutOptions.FillAndExpand;
-                    var slider = new Slider();
-                    slider.SetBinding(Slider.ValueProperty, new Binding("Posision", BindingMode.TwoWay));
-                    slider.HorizontalOptions = LayoutOptions.FillAndExpand;
-                    slider.SetValue(Grid.ColumnProperty, 0);
-                    layout.Children.Add(slider);
-                    var colsel = new ColorPicker();
-                    colsel.SetBinding(ColorPicker.SelectedColorProperty, new Binding("Color", BindingMode.TwoWay));
-                    colsel.SetValue(Grid.ColumnProperty, 1);
-                    layout.Children.Add(colsel);
-                    StackLayout.Children.Insert(insertIndex ++, layout);
+                    StackLayout.Children.Insert(insertIndex++, NewItem(parette));
                 }
             }
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
@@ -63,6 +47,66 @@ namespace Mandelbrot_Julia_Viewer.Views
                     StackLayout.Children.RemoveAt(e.OldStartingIndex + l);
                 }
             }
+        }
+
+        private View NewItem(object parette)
+        {
+            var layout = new Grid();
+            layout.BindingContext = parette;
+            layout.ColumnDefinitions = new ColumnDefinitionCollection();
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6, GridUnitType.Star) });
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.5, GridUnitType.Star) });
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(0.5, GridUnitType.Star) });
+            layout.BackgroundColor = Color.DarkKhaki;
+            layout.HorizontalOptions = LayoutOptions.FillAndExpand;
+            var slider = new Slider();
+            slider.Maximum = 100;
+            slider.SetBinding(Slider.ValueProperty, new Binding("Position", BindingMode.TwoWay));
+            slider.HorizontalOptions = LayoutOptions.FillAndExpand;
+            slider.ValueChanged += Parette_ValueChanged;
+            slider.SetValue(Grid.ColumnProperty, 0);
+            layout.Children.Add(slider);
+            var colsel = new ColorPicker();
+            colsel.SetBinding(ColorPicker.SelectedColorProperty, new Binding("Color", BindingMode.TwoWay));
+            colsel.ColorChanged += ColorChanged;
+            colsel.SetValue(Grid.ColumnProperty, 1);
+            layout.Children.Add(colsel);
+            var addButton = new Button();
+            addButton.Text = "＋";
+            addButton.Clicked += AddButton_Clicked;
+            addButton.SetValue(Grid.ColumnProperty, 2);
+            layout.Children.Add(addButton);
+            var subButton = new Button();
+            subButton.Text = "－";
+            subButton.Clicked += SubButton_Clicked;
+            subButton.SetValue(Grid.ColumnProperty, 3);
+            layout.Children.Add(subButton);
+            return layout;
+        }
+
+        private void ColorChanged(object sender, ColorChangedEventArgs e)
+        {
+            ((MJViewModel)BindingContext).ColorParette = ColorParette;
+        }
+
+        private void Parette_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            ((MJViewModel)BindingContext).ColorParette = ColorParette;
+        }
+
+        private void AddButton_Clicked(object sender, EventArgs e)
+        {
+            int index = StackLayout.Children.IndexOf(((View)sender).Parent as View);
+            Parette.Insert(index, new Mandelbrot_Julia.ColorResolutionStruct());
+            ((MJViewModel)BindingContext).ColorParette = ColorParette;
+        }
+
+        private void SubButton_Clicked(object sender, EventArgs e)
+        {
+            int index = StackLayout.Children.IndexOf(((View)sender).Parent as View);
+            Parette.RemoveAt(index);
+            ((MJViewModel)BindingContext).ColorParette = ColorParette;
         }
 
         public ColorParettePage()
@@ -82,6 +126,7 @@ namespace Mandelbrot_Julia_Viewer.Views
 
             InitializeComponent();
 
+            BindingContext = viewModel;
             ColorParette = viewModel.ColorParette;
             ToolbarItems.Add(new ToolbarItem("←", "", () => { ((MasterDetailPage)Parent).Detail = new DrawPage(viewModel); }, ToolbarItemOrder.Default));
         }
