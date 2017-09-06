@@ -18,6 +18,8 @@
                 <Entry x:Name="EntryRepert" Text="{Binding Repert, Mode=TwoWay}" VerticalOptions="Center"/>
                 <Label Text="Resolution" VerticalTextAlignment="Center"/>
                 <Entry x:Name="EntryResolution" Text="{Binding Resolution, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Label Text="JuliaMapSplit" VerticalTextAlignment="Center"/>
+                <Entry x:Name="EntryJuliaMapSplit" Text="{Binding JuliaMapSplit, Mode=TwoWay}" VerticalOptions="Center"/>
                 <Label Text="ColorParette" VerticalTextAlignment="Center"/>
                 <Switch IsToggled="{Binding UseColorParette}"/>
                 <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>

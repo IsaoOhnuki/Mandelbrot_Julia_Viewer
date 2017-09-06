@@ -18,6 +18,7 @@ namespace Models
         public int Repert { get; set; }
         public int Resolution { get; set; }
         public int ParetteType { get; set; }
+        public int JuliaMapSplit { get; set; }
         public Parette ColorParette { get; set; }
         private int[] data;
         public int[] Data
@@ -61,6 +62,19 @@ namespace Models
             Data = mj.Data;
             Image = mj.Image;
         }
+        public Mandelbrot_Julia(double xpos, double ypos, int repert, int resolution, int split, int colorParette, ColorResolutionStruct[] colors)
+        {
+            IPos = double.NaN;
+            JPos = double.NaN;
+            XPos = xpos;
+            YPos = ypos;
+            Radius = 0;
+            Repert = repert;
+            Resolution = resolution;
+            JuliaMapSplit = split;
+            ParetteType = colorParette;
+            ColorParette = new Parette(repert, colors);
+        }
         public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int colorParette, ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
@@ -70,6 +84,7 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
+            JuliaMapSplit = 0;
             ParetteType = colorParette;
             ColorParette = new Parette(repert, colors);
         }
@@ -82,6 +97,7 @@ namespace Models
             Radius = radius;
             Repert = repert;
             Resolution = resolution;
+            JuliaMapSplit = 0;
             ParetteType = colorParette;
             ColorParette = new Parette(repert, colors);
         }
@@ -105,6 +121,7 @@ namespace Models
                 && (Double.IsNaN(Radius) ? Double.IsNaN(((Mandelbrot_Julia)obj).Radius) : Radius == ((Mandelbrot_Julia)obj).Radius)
                 && Repert == ((Mandelbrot_Julia)obj).Repert
                 && Resolution == ((Mandelbrot_Julia)obj).Resolution
+                && JuliaMapSplit == ((Mandelbrot_Julia)obj).JuliaMapSplit
                 && ParetteType == ((Mandelbrot_Julia)obj).ParetteType
                 && ColorParette == ((Mandelbrot_Julia)obj).ColorParette;
         }

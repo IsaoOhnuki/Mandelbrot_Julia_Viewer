@@ -141,6 +141,16 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 OnPropertyChanged();
             }
         }
+        private int juliaMapSplit;
+        public int JuliaMapSplit
+        {
+            get { return juliaMapSplit; }
+            set
+            {
+                juliaMapSplit = value;
+                OnPropertyChanged();
+            }
+        }
 
         private ImageSource imageSource;
         public ImageSource ImageSource
@@ -166,6 +176,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             Radius = 2;
             Repert = 63;
             Resolution = 4096;
+            JuliaMapSplit = 11;
             Rate = 1;
             ImageHeight = 1024;
             ImageWidth = 1024;
@@ -188,6 +199,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
+                JuliaMapSplit = mj.JuliaMapSplit;
                 UseColorParette = mj.ParetteType > 0;
                 ColorParette = mj.ColorParette.ColorResolutions;
                 OnPropertyChanged(nameof(CanUndo));
@@ -203,6 +215,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 Radius = mj.Radius;
                 Repert = mj.Repert;
                 Resolution = mj.Resolution;
+                JuliaMapSplit = mj.JuliaMapSplit;
                 UseColorParette = mj.ParetteType > 0;
                 ColorParette = mj.ColorParette.ColorResolutions;
                 OnPropertyChanged(nameof(CanUndo));
@@ -248,12 +261,12 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 FractalType = "JuliaSet";
             });
             JuliaMupRun = new Command(async () => {
-                int split = 51;
-                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, 0, Repert, Resolution / split * split, UseColorParette ? 1 : 0, ColorParette);
+                int split = JuliaMapSplit == 0 ? 11 : JuliaMapSplit;
+                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, Repert, Resolution / split * split, split, UseColorParette ? 1 : 0, ColorParette);
                 byte[] bmp;
                 if (!UndoList.HasLast || UndoList.Last != mj)
                 {
-                    mj.Data = await Mandelbrot_Julia.JuliaMap(mj.XPos, mj.YPos, mj.Repert, mj.Resolution, split);
+                    mj.Data = await Mandelbrot_Julia.JuliaMap(mj.XPos, mj.YPos, mj.Repert, mj.Resolution, mj.JuliaMapSplit);
                     mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ParetteType > 0 ? mj.ColorParette : null);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
