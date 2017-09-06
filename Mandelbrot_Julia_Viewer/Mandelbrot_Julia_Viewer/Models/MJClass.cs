@@ -235,35 +235,28 @@ namespace Models
             }
         }
 
-        //// http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
-        //public static Color[] ColorResolution(int repert, ColorResolutionStruct[] cols)
+        //private class Complex
         //{
-        //    Color[] ret = new Color[repert + 1];
-        //    Color prevCol = Color.Transparent;
-        //    int prevPos = 0;
-        //    foreach (var col in cols)
+        //    public double Real { get; set; }
+        //    public double Imaginary { get; set; }
+        //    public double Magnitude { get { return Math.Sqrt(Real * Real + Imaginary * Imaginary); } }
+        //    public double Phase { get { return Math.Atan2(Imaginary, Real); } }
+
+        //    public Complex(double real, double imaginary)
         //    {
-        //        int pos = (int)((repert - 1) * col.Posision);
-        //        ret[pos] = col.Color;
-        //        if (prevCol != Color.Transparent)
-        //        {
-        //            int dist = pos - prevPos + 1;
-        //            if (dist > 2)
-        //            {
-        //                for (int graPos = prevPos + 1; graPos < pos; ++graPos)
-        //                {
-        //                    double r = (ret[pos].R - prevCol.R) * (graPos - prevPos) / dist + prevCol.R;
-        //                    double g = (ret[pos].G - prevCol.G) * (graPos - prevPos) / dist + prevCol.G;
-        //                    double b = (ret[pos].B - prevCol.B) * (graPos - prevPos) / dist + prevCol.B;
-        //                    ret[graPos] = new Color(r, g, b);
-        //                }
-        //            }
-        //        }
-        //        prevCol = col.Color;
-        //        prevPos = pos;
+        //        Real = real;
+        //        Imaginary = imaginary;
         //    }
-        //    ret[repert] = ret[0];
-        //    return ret;
+
+        //    public static Complex operator +(Complex l, Complex r)
+        //    {
+        //        return new Complex(l.Real + r.Real, l.Imaginary + r.Imaginary);
+        //    }
+
+        //    public static Complex operator *(Complex l, Complex r)
+        //    {
+        //        return new Complex(l.Real * r.Real - l.Imaginary * r.Imaginary, l.Real * r.Imaginary + r.Real * l.Imaginary);
+        //    }
         //}
 
         public static Task<int[]> Mandelbrot(double xpos, double ypos, double radius, int repert, int resolution)
@@ -379,7 +372,6 @@ namespace Models
                         #endregion
 
                         #region No Complex Code
-                        //double y = ymax - j * radius * 2 / (resolution - 1);
                         double y = j * radius * 2 / (resolution - 1) - ymin;
                         double a = x;
                         double b = y;
