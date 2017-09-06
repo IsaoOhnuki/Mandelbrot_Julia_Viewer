@@ -418,9 +418,16 @@ namespace Models
             });
         }
 
+        //http://qwerty2501.hatenablog.com/entry/2014/04/24/235849 async/await ～非同期なライブラリは楽じゃない～
+        //http://mcommit.hatenadiary.com/entry/2016/07/22/014657 C# Task async, await の使い方
+        //http://ufcpp.net/study/csharp/misc_task.html [雑記] スレッド プールとタスク
+        //http://outside6.wp.xdomain.jp/2016/08/06/post-343/ Task.Waitはスレッドをロックする Task.Waitの問題点
+        //http://outside6.wp.xdomain.jp/2016/08/09/post-568/ TaskとawaitのデッドロックをTaskで回避する
+        //http://qiita.com/acple@github/items/8f63aacb13de9954c5da Taskを極めろ！async/await完全攻略
+
         public static Task<int[]> JuliaMap(double xpos, double ypos, int repert, int resolution, int split)
         {
-            return Task.Run<int[]>(async () => {
+            return Task.Run<int[]>(() => {
                 int size = resolution / split;
                 resolution = size * split;
 
@@ -429,28 +436,32 @@ namespace Models
                 double radius = 2;
                 double julia = radius * 2 / (split - 1);
 
+                List<Task<int[]>> tasks = new List<Task<int[]>>();
+
                 for (int j = 0; j < split; ++j)
                 {
                     for (int i = 0; i < split; ++i)
                     {
-                        int[] Julia = await Mandelbrot_Julia.Julia(-radius + julia * i, -radius + julia * j, 0, 0, 2, repert, size);
+                        tasks.Add(Mandelbrot_Julia.Julia(-radius + julia * i, -radius + julia * j, 0, 0, 2, repert, size));
+                    }
+                }
 
+                Task.WaitAll(tasks.ToArray());
+
+                for (int j = 0; j < split; ++j)
+                {
+                    for (int i = 0; i < split; ++i)
+                    {
                         for (int y = 0; y < size; ++y)
                         {
                             for (int x = 0; x < size; ++x)
                             {
-                                try
-                                {
-                                    data[j * size * resolution + i * size + y * resolution + x] = Julia[y * size + x];
-                                }
-                                catch
-                                {
-                                    break;
-                                }
+                                data[j * size * resolution + i * size + y * resolution + x] = tasks[j * split + i].Result[y * size + x];
                             }
                         }
                     }
                 }
+
                 return data;
             });
         }
