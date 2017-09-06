@@ -350,7 +350,7 @@ namespace Models
 
                 #region No Complex Code
                 double xmin = xpos - radius;
-                double ymax = ypos + radius;
+                double ymin = ypos + radius;
                 #endregion
 
                 int i = 0;
@@ -361,7 +361,7 @@ namespace Models
                     #endregion
 
                     #region No Complex Code
-                    double x = xmin + i * radius * 2 / (resolution - 1);
+                    double x = i * radius * 2 / (resolution - 1) + xmin;
                     #endregion
 
                     for (int j = 0; j < resolution; j++)
@@ -379,7 +379,8 @@ namespace Models
                         #endregion
 
                         #region No Complex Code
-                        double y = ymax - j * radius * 2 / (resolution - 1);
+                        //double y = ymax - j * radius * 2 / (resolution - 1);
+                        double y = j * radius * 2 / (resolution - 1) - ymin;
                         double a = x;
                         double b = y;
                         double a2 = a * a;
