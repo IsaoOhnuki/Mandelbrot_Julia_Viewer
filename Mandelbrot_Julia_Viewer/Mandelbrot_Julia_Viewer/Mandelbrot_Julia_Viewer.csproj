@@ -41,6 +41,7 @@
     </Compile>
     <Compile Include="Controls\ColorPicker.cs" />
     <Compile Include="Controls\GradationDrawer.cs" />
+    <Compile Include="Models\ColorResolution.cs" />
     <Compile Include="ViewModels\MJViewModel.cs" />
     <Compile Include="Views\ColorParettePage.xaml.cs">
       <DependentUpon>ColorParettePage.xaml</DependentUpon>

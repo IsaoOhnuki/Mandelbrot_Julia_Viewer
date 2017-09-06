@@ -18,15 +18,15 @@ namespace Mandelbrot_Julia_Viewer.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ColorParettePage : ContentPage
     {
-        public ObservableCollection<Mandelbrot_Julia.ColorResolutionStruct> Parette { get; set; }
-        public Mandelbrot_Julia.ColorResolutionStruct[] ColorParette
+        public ObservableCollection<ColorResolutionStruct> Parette { get; set; }
+        public ColorResolutionStruct[] ColorParette
         {
-            get { return Parette.Select(x => new Mandelbrot_Julia.ColorResolutionStruct { Color = x.Color, Position = x.Position / 100 }).ToArray(); }
+            get { return Parette.Select(x => new ColorResolutionStruct { Color = x.Color, Position = x.Position / 100 }).ToArray(); }
             set
             {
                 Parette.Clear();
                 foreach (var val in value)
-                    Parette.Add(new Mandelbrot_Julia.ColorResolutionStruct { Color = val.Color, Position = val.Position * 100 });
+                    Parette.Add(new ColorResolutionStruct { Color = val.Color, Position = val.Position * 100 });
             }
         }
 
@@ -98,7 +98,7 @@ namespace Mandelbrot_Julia_Viewer.Views
         private void AddButton_Clicked(object sender, EventArgs e)
         {
             int index = StackLayout.Children.IndexOf(((View)sender).Parent as View);
-            Parette.Insert(index, new Mandelbrot_Julia.ColorResolutionStruct());
+            Parette.Insert(index, new ColorResolutionStruct());
             ((MJViewModel)BindingContext).ColorParette = ColorParette;
         }
 
@@ -111,7 +111,7 @@ namespace Mandelbrot_Julia_Viewer.Views
 
         public ColorParettePage()
         {
-            Parette = new ObservableCollection<Mandelbrot_Julia.ColorResolutionStruct>();
+            Parette = new ObservableCollection<ColorResolutionStruct>();
             Parette.CollectionChanged += Parette_CollectionChanged;
 
             InitializeComponent();
@@ -121,7 +121,7 @@ namespace Mandelbrot_Julia_Viewer.Views
 
         public ColorParettePage(MJViewModel viewModel)
         {
-            Parette = new ObservableCollection<Mandelbrot_Julia.ColorResolutionStruct>();
+            Parette = new ObservableCollection<ColorResolutionStruct>();
             Parette.CollectionChanged += Parette_CollectionChanged;
 
             InitializeComponent();

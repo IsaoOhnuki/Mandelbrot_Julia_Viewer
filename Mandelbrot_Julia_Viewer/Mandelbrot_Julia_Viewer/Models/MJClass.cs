@@ -62,7 +62,7 @@ namespace Models
             Data = mj.Data;
             Image = mj.Image;
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int split, int colorParette, ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int split, /*int colorParette, */ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -75,7 +75,7 @@ namespace Models
             //ParetteType = colorParette;
             //ColorParette = new Parette(repert, colors);
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int colorParette, ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, /*int colorParette, */ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -88,7 +88,7 @@ namespace Models
             //ParetteType = colorParette;
             //ColorParette = new Parette(repert, colors);
         }
-        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, int colorParette, ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, /*int colorParette, */ColorResolutionStruct[] colors)
         {
             IPos = ipos;
             JPos = jpos;
