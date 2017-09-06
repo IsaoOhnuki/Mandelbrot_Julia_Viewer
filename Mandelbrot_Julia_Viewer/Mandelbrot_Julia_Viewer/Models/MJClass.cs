@@ -408,5 +408,42 @@ namespace Models
                 return data;
             });
         }
+
+        public static Task<int[]> JuliaMap(double xpos, double ypos, int repert, int resolution, int split)
+        {
+            return Task.Run<int[]>(async () => {
+                int size = resolution / split;
+                resolution = size * split;
+
+                int[] data = new int[resolution * resolution];
+
+                double radius = 2;
+                double julia = radius * 2 / (split - 1);
+
+                for (int j = 0; j < split; ++j)
+                {
+                    for (int i = 0; i < split; ++i)
+                    {
+                        int[] Julia = await Mandelbrot_Julia.Julia(-radius + julia * i, -radius + julia * j, 0, 0, 2, repert, size);
+
+                        for (int y = 0; y < size; ++y)
+                        {
+                            for (int x = 0; x < size; ++x)
+                            {
+                                try
+                                {
+                                    data[j * size * resolution + i * size + y * resolution + x] = Julia[y * size + x];
+                                }
+                                catch
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return data;
+            });
+        }
     }
 }

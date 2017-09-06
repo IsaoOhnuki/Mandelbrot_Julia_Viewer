@@ -15,6 +15,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
     {
         public Command MandelbrotRun { get; set; }
         public Command JuliaRun { get; set; }
+        public Command JuliaMupRun { get; set; }
         public Command Undo { get; set; }
         public Command Redo { get; set; }
         public bool CanUndo { get { return UndoList.CanUndo; } }
@@ -164,7 +165,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             YPos = 0;
             Radius = 2;
             Repert = 63;
-            Resolution = 1024;
+            Resolution = 4096;
             Rate = 1;
             ImageHeight = 1024;
             ImageWidth = 1024;
@@ -234,6 +235,26 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mj.Data = await Mandelbrot_Julia.Julia(mj.IPos, mj.JPos, mj.XPos, mj.YPos, mj.Radius, mj.Repert, mj.Resolution);
                     mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ParetteType > 0 ? mj.ColorParette: null);
+                    bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
+                    UndoList.Push(mj);
+                    OnPropertyChanged(nameof(CanUndo));
+                    OnPropertyChanged(nameof(CanRedo));
+                }
+                else
+                {
+                    bmp = await BitmapCreator.Create((short)UndoList.Last.Resolution, (short)UndoList.Last.Resolution, UndoList.Last.Image);
+                }
+                ImageSource = ImageSource.FromStream(() => new MemoryStream(bmp));
+                FractalType = "JuliaSet";
+            });
+            JuliaMupRun = new Command(async () => {
+                int split = 51;
+                Mandelbrot_Julia mj = new Mandelbrot_Julia(XPos, YPos, 0, Repert, Resolution / split * split, UseColorParette ? 1 : 0, ColorParette);
+                byte[] bmp;
+                if (!UndoList.HasLast || UndoList.Last != mj)
+                {
+                    mj.Data = await Mandelbrot_Julia.JuliaMap(mj.XPos, mj.YPos, mj.Repert, mj.Resolution, split);
+                    mj.Image = await Mandelbrot_Julia.Develop(mj.Repert, mj.Data, mj.ParetteType > 0 ? mj.ColorParette : null);
                     bmp = await BitmapCreator.Create((short)mj.Resolution, (short)mj.Resolution, mj.Image);
                     UndoList.Push(mj);
                     OnPropertyChanged(nameof(CanUndo));
