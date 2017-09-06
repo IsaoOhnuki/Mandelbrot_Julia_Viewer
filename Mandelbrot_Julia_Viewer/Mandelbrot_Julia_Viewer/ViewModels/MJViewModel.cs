@@ -237,7 +237,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = await Mandelbrot_Julia.Mandelbrot(mji.MJ.XPos, mji.MJ.YPos, mji.MJ.Radius, mji.MJ.Repert, mji.MJ.Resolution);
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
@@ -246,7 +246,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = UndoList.Last.MJ.Data;
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
@@ -267,7 +267,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = await Mandelbrot_Julia.Julia(mji.MJ.IPos, mji.MJ.JPos, mji.MJ.XPos, mji.MJ.YPos, mji.MJ.Radius, mji.MJ.Repert, mji.MJ.Resolution);
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
@@ -276,7 +276,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = UndoList.Last.MJ.Data;
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
@@ -299,7 +299,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = await Mandelbrot_Julia.JuliaMap(mji.MJ.XPos, mji.MJ.YPos, mji.MJ.Radius, mji.MJ.Repert, mji.MJ.Resolution, mji.MJ.JuliaMapSplit);
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));
@@ -308,7 +308,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     mji.MJ.Data = UndoList.Last.MJ.Data;
                     mji.MJ.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
-                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image);
+                    mji.Bmp = await BitmapCreator.Create((short)mji.MJ.Resolution, (short)mji.MJ.Resolution, mji.MJ.Image, false);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
                     OnPropertyChanged(nameof(CanRedo));

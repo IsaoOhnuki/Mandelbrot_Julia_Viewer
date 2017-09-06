@@ -152,6 +152,7 @@ namespace Models
             });
         }
 
+#if ComplexClassDefine
         private class Complex
         {
             public double Real { get; set; }
@@ -175,6 +176,7 @@ namespace Models
                 return new Complex(l.Real * r.Real - l.Imaginary * r.Imaginary, l.Real * r.Imaginary + r.Real * l.Imaginary);
             }
         }
+#endif
 
         public static Task<int[]> Mandelbrot(double xpos, double ypos, double radius, int repert, int resolution)
         {
