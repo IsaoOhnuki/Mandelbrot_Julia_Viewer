@@ -16,9 +16,11 @@ namespace Models
 
                 // OS/2Bitmap
                 // bitmapヘッダ
+                int widthFiller = (Width * 3) % 4;
+                widthFiller = widthFiller == 0 ? 0 : 4 - widthFiller;
                 bw.Write((byte)'B');
                 bw.Write((byte)'M');
-                bw.Write((int)14 + 12 + Width * Height * 3);
+                bw.Write((int)14 + 12 + (Width * 3 + widthFiller) * Height);
                 bw.Write((short)0);
                 bw.Write((short)0);
                 bw.Write((int)14 + 12);
@@ -38,12 +40,16 @@ namespace Models
                         bw.Write(data[h * Width * 4 + w + 2]); // R値
                         //bw.Write(data[h * Width * 4 + w + 3]); α値は捨てる
                     }
+                    for (int w = 0; w < widthFiller; ++w)
+                    {
+                        bw.Write((byte)0); // 4バイト境界調整
+                    }
                 }
                 //// WindowsBitmap
                 //// bitmapヘッダ
                 //bw.Write((byte)'B');
                 //bw.Write((byte)'M');
-                //bw.Write((int)14 + 40 + Width * Height * 4);
+                //bw.Write((int)14 + 40 + Width * 4 * Height);
                 //bw.Write((short)0);
                 //bw.Write((short)0);
                 //bw.Write((int)14 + 40);
