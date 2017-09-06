@@ -91,7 +91,7 @@ namespace Models
         }
     }
 
-    public struct ColorResolutionStruct
+    public class ColorResolutionStruct
     {
         public Color Color { get; set; }
         public double Position { get; set; }
