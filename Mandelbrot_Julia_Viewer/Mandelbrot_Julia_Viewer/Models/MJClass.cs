@@ -1,4 +1,4 @@
-﻿#define ComplexClassDefine
+﻿//#define ComplexClassDefine
 
 using System;
 using System.Collections.Generic;
@@ -215,7 +215,8 @@ namespace Models
                         double y = j * (maximum.Imaginary - minimum.Imaginary) / (resolution - 1);
                         Complex c = new Complex(minimum.Real + x, maximum.Imaginary - y);
                         Complex z = new Complex(c.Real, c.Imaginary);
-                        while (z.Magnitude < 2 && count > 0)
+                        while ((z.Real * z.Real + z.Imaginary * z.Imaginary) <= 4 && count > 0)
+                        //while (z.Magnitude < 2 && count > 0)
                         {
                             z = (z * z) + c;
                             --count;
@@ -289,7 +290,8 @@ namespace Models
                         #region Complex Code
                         double y = j * (maximum.Imaginary - minimum.Imaginary) / (resolution - 1);
                         Complex z = new Complex(minimum.Real + x, maximum.Imaginary - y);
-                        while (z.Magnitude < 2 && count > 0)
+                        while ((z.Real * z.Real + z.Imaginary * z.Imaginary) <= 4 && count > 0)
+                        //while (z.Magnitude < 2 && count > 0)
                         {
                             z = (z * z) + julia;
                             --count;
