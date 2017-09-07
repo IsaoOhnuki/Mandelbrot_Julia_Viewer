@@ -39,13 +39,13 @@ namespace Models
         // http://www.sofgate.com/design/ct_gradation.html グラデーション配色の計算方法
         public static Color[] Parette(int repert, ColorResolutionStruct[] cols)
         {
-            Color[] ret = new Color[repert + 1];
+            Color[] ret = new Color[repert];
             for (int arrayidx = 0; arrayidx < repert; ++arrayidx)
             {
-                double pos = (double)arrayidx / (repert - 1);
+                double pos = (double)arrayidx / repert;
                 for (int prevcolpos = 0, colpos = 1; colpos < cols.Count(); ++colpos, ++prevcolpos)
                 {
-                    if (pos >= cols[prevcolpos].Position && pos <= cols[colpos].Position)
+                    if (pos >= cols[prevcolpos].Position && (pos <= cols[colpos].Position || colpos == cols.Count() - 1))
                     {
                         double r = (cols[colpos].Color.R - cols[prevcolpos].Color.R) * (pos - cols[prevcolpos].Position) / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.R;
                         double g = (cols[colpos].Color.G - cols[prevcolpos].Color.G) * (pos - cols[prevcolpos].Position) / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.G;
@@ -55,7 +55,6 @@ namespace Models
                     }
                 }
             }
-            ret[repert] = ret[0];
             return ret;
         }
         public static bool operator ==(ColorResolution l, ColorResolution r)

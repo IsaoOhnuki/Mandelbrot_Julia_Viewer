@@ -240,6 +240,8 @@ namespace Models
                         #endregion
 #endif
                         data[j * resolution + i] = repert - count;
+                        if (data[j * resolution + i] == repert)
+                            data[j * resolution + i] = 0;
                     }
                 }
                 for (; i < resolution; i++)
@@ -315,6 +317,8 @@ namespace Models
                         #endregion
 #endif
                         data[j * resolution + i] = repert - count;
+                        if (data[j * resolution + i] == repert)
+                            data[j * resolution + i] = 0;
                     }
                 }
                 for (; i < resolution; i++)
