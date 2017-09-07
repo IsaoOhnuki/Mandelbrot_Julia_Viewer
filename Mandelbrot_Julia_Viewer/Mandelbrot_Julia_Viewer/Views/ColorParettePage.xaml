@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Mandelbrot_Julia_Viewer.Views.ColorParettePage">
+             x:Class="Mandelbrot_Julia_Viewer.Views.ColorParettePage"
+             xmlns:Controls="clr-namespace:Controls">
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical">
-            <StackLayout x:Name="StackLayout" HorizontalOptions="FillAndExpand" BackgroundColor="Red">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <StackLayout Orientation="Vertical" Grid.Column="1">
+                <StackLayout x:Name="StackLayout" HorizontalOptions="FillAndExpand" BackgroundColor="Red">
+                </StackLayout>
             </StackLayout>
-        </StackLayout>
+            <Controls:GradationDrawer x:Name="GradationDrawer" Grid.Column="0" Colors="{Binding Parette}"/>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

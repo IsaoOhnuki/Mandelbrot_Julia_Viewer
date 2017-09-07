@@ -10,6 +10,7 @@ using Xamarin.Forms;
 
 namespace Mandelbrot_Julia_Viewer.ViewModels
 {
+    // http://qiita.com/kiichi54321/items/7b7a7b0caa2f09ba4147 UWPのアプリを作っているうえで、早く知りたかったこと。
     // http://garicchi.com/?p=16481 プリンターを使って印刷するには
     public class MJViewModel : BindableObject
     {
@@ -192,8 +193,8 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             ColorParette = new ColorResolutionStruct[] {
                             new ColorResolutionStruct{ Color = Color.Black, Position = 0 },
                             new ColorResolutionStruct{ Color = Color.Red, Position = 0.15 },
-                            new ColorResolutionStruct{ Color = Color.DarkViolet, Position = 0.3 },
-                            new ColorResolutionStruct{ Color = Color.Blue, Position = 0.6 },
+                            new ColorResolutionStruct{ Color = Color.Orange, Position = 0.3 },
+                            new ColorResolutionStruct{ Color = Color.Yellow, Position = 0.6 },
                             new ColorResolutionStruct{ Color = Color.White, Position = 1 }
                         };
 

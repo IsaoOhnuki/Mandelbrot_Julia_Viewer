@@ -2,6 +2,7 @@
   "dependencies": {
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.4.0",
     "System.ObjectModel": "4.3.0",
+    "Win2D.uwp": "1.21.0",
     "Xamarin.Forms": "2.4.0.266-pre1"
   },
   "frameworks": {
