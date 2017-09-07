@@ -23,15 +23,12 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
     class GradationDrawerRenderer : ViewRenderer<GradationDrawer, CanvasControl>
     {
-        private new List<ColorPicker> Children { get; set; }
-
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
         {
             if (Control == null && e.NewElement != null)
             {
                 var ctrl = new CanvasControl();
                 SetNativeControl(ctrl);
-                Children = new List<ColorPicker>();
             }
             if (Control != null && e.OldElement != null)
             {
@@ -41,6 +38,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
                     {
                         val.PropertyChanged -= Colors_PropertyChanged;
                     }
+                    Children.Clear();
                 }
                 if (e.OldElement.Colors is INotifyCollectionChanged)
                     (e.OldElement.Colors as INotifyCollectionChanged).CollectionChanged -= Colors_CollectionChanged;
@@ -55,6 +53,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
                     foreach (var val in e.NewElement.Colors as IList<GradationDrawer.ColPos>)
                     {
                         val.PropertyChanged += Colors_PropertyChanged;
+                        var picker = new ColorPicker();
+                        picker.SelectedColor = val.Color;
+                        Children.Insert(Children.Count, picker.GetOrCreateRenderer() as Panel);
                     }
                 }
                 if (e.NewElement.Colors is INotifyCollectionChanged)
@@ -72,7 +73,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
             // プロパティ値の変更を反映
             if (e.PropertyName == GradationDrawer.ColorsProperty.PropertyName)
             {
-                //Element.Colors;
+                Control.Invalidate();
             }
         }
 
@@ -96,9 +97,10 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 int insertIndex = e.NewStartingIndex;
                 foreach (var parette in e.NewItems)
                 {
+                    ((GradationDrawer.ColPos)parette).PropertyChanged += Colors_PropertyChanged;
                     var picker = new ColorPicker();
                     picker.SelectedColor = ((IList<GradationDrawer.ColPos>)Element.Colors)[insertIndex].Color;
-                    Children.Insert(insertIndex++, picker);
+                    Children.Insert(insertIndex++, picker.GetOrCreateRenderer() as Panel);
                 }
             }
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)

@@ -1,5 +1,6 @@
 ﻿using Controls;
 using Mandelbrot_Julia_Viewer.ViewModels;
+using Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,14 +19,15 @@ namespace Mandelbrot_Julia_Viewer.Views
     public partial class ColorParettePage : ContentPage
     {
         public ObservableCollection<GradationDrawer.ColPos> Parette { get; set; }
-        public GradationDrawer.ColPos[] ColorParette
+
+        public ColorResolutionStruct[] ColorParette
         {
-            get { return Parette.Select(x => new GradationDrawer.ColPos { Color = x.Color, Position = x.Position / 100 }).ToArray(); }
+            get { return Parette.Select(x => new ColorResolutionStruct { Color = x.Color, Position = (double)x.Position / 100 }).ToArray(); }
             set
             {
                 Parette.Clear();
                 foreach (var val in value)
-                    Parette.Add(new GradationDrawer.ColPos { Color = val.Color, Position = val.Position * 100 });
+                    Parette.Add(new GradationDrawer.ColPos { Color = val.Color, Position = (int)(val.Position * 100) });
             }
         }
 
@@ -86,26 +88,26 @@ namespace Mandelbrot_Julia_Viewer.Views
 
         private void ColorChanged(object sender, ColorChangedEventArgs e)
         {
-            ((MJViewModel)BindingContext).ColorParette = ColorParette.Select(x => new Models.ColorResolutionStruct { Color = x.Color, Position = x.Position }).ToArray();
+            ((MJViewModel)BindingContext).ColorParette = ColorParette.ToArray();
         }
 
         private void Parette_ValueChanged(object sender, ValueChangedEventArgs e)
         {
-            ((MJViewModel)BindingContext).ColorParette = ColorParette.Select(x => new Models.ColorResolutionStruct { Color = x.Color, Position = x.Position }).ToArray();
+            ((MJViewModel)BindingContext).ColorParette = ColorParette.ToArray();
         }
 
         private void AddButton_Clicked(object sender, EventArgs e)
         {
             int index = StackLayout.Children.IndexOf(((View)sender).Parent as View);
-            Parette.Insert(index, new GradationDrawer.ColPos());
-            ((MJViewModel)BindingContext).ColorParette = ColorParette.Select(x => new Models.ColorResolutionStruct { Color = x.Color, Position = x.Position }).ToArray();
+            Parette.Insert(index, new GradationDrawer.ColPos { Color = Parette[index].Color, Position = Parette[index].Position });
+            ((MJViewModel)BindingContext).ColorParette = ColorParette.ToArray();
         }
 
         private void SubButton_Clicked(object sender, EventArgs e)
         {
             int index = StackLayout.Children.IndexOf(((View)sender).Parent as View);
             Parette.RemoveAt(index);
-            ((MJViewModel)BindingContext).ColorParette = ColorParette.Select(x => new Models.ColorResolutionStruct { Color = x.Color, Position = x.Position }).ToArray();
+            ((MJViewModel)BindingContext).ColorParette = ColorParette.ToArray();
         }
 
         public ColorParettePage()
@@ -127,7 +129,7 @@ namespace Mandelbrot_Julia_Viewer.Views
 
             BindingContext = viewModel;
             GradationDrawer.BindingContext = this;
-            ColorParette = viewModel.ColorParette.Select(x => new GradationDrawer.ColPos { Color = x.Color, Position = x.Position }).ToArray();
+            ColorParette = viewModel.ColorParette.ToArray();
             ToolbarItems.Add(new ToolbarItem("←", "", () => { ((MasterDetailPage)Parent).Detail = new DrawPage(viewModel); }, ToolbarItemOrder.Default));
         }
     }

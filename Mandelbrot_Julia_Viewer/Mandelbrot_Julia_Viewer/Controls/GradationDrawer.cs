@@ -23,8 +23,8 @@ namespace Controls
                     OnPropertyChanged();
                 }
             }
-            private double position;
-            public double Position
+            private int position;
+            public int Position
             {
                 get { return position; }
                 set
@@ -90,11 +90,13 @@ namespace Controls
                     double pos = (double)arrayidx * 100 / arraySize;
                     for (int prevcolpos = 0, colpos = 1; colpos < colors.Count; ++colpos, ++prevcolpos)
                     {
-                        if (pos >= colors[prevcolpos].Position && (pos < colors[colpos].Position || colpos == colors.Count - 1))
+                        double prevPosition = colors[prevcolpos].Position;
+                        double position = colors[colpos].Position;
+                        if (pos >= prevPosition && (pos < position || colpos == colors.Count - 1))
                         {
-                            double r = (colors[colpos].Color.R - colors[prevcolpos].Color.R) * (pos - colors[prevcolpos].Position) / (colors[colpos].Position - colors[prevcolpos].Position) + colors[prevcolpos].Color.R;
-                            double g = (colors[colpos].Color.G - colors[prevcolpos].Color.G) * (pos - colors[prevcolpos].Position) / (colors[colpos].Position - colors[prevcolpos].Position) + colors[prevcolpos].Color.G;
-                            double b = (colors[colpos].Color.B - colors[prevcolpos].Color.B) * (pos - colors[prevcolpos].Position) / (colors[colpos].Position - colors[prevcolpos].Position) + colors[prevcolpos].Color.B;
+                            double r = (colors[colpos].Color.R - colors[prevcolpos].Color.R) * (pos - prevPosition) / (position - prevPosition) + colors[prevcolpos].Color.R;
+                            double g = (colors[colpos].Color.G - colors[prevcolpos].Color.G) * (pos - prevPosition) / (position - prevPosition) + colors[prevcolpos].Color.G;
+                            double b = (colors[colpos].Color.B - colors[prevcolpos].Color.B) * (pos - prevPosition) / (position - prevPosition) + colors[prevcolpos].Color.B;
                             ret[arrayidx] = new Color(r, g, b);
                             break;
                         }
