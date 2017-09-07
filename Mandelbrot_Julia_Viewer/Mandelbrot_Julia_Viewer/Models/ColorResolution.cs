@@ -43,8 +43,7 @@ namespace Models
             for (int arrayidx = 0; arrayidx < repert; ++arrayidx)
             {
                 double pos = (double)arrayidx / (repert - 1);
-                int prevcolpos = 0;
-                for (int colpos = 1; colpos < cols.Count(); ++colpos)
+                for (int prevcolpos = 0, colpos = 1; colpos < cols.Count(); ++colpos, ++prevcolpos)
                 {
                     if (pos > cols[prevcolpos].Position && pos <= cols[colpos].Position)
                     {
