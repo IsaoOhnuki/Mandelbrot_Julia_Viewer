@@ -45,11 +45,11 @@ namespace Models
                 double pos = (double)arrayidx / (repert - 1);
                 for (int prevcolpos = 0, colpos = 1; colpos < cols.Count(); ++colpos, ++prevcolpos)
                 {
-                    if (pos > cols[prevcolpos].Position && pos <= cols[colpos].Position)
+                    if (pos >= cols[prevcolpos].Position && pos <= cols[colpos].Position)
                     {
-                        double r = (cols[colpos].Color.R - cols[prevcolpos].Color.R) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.R;
-                        double g = (cols[colpos].Color.G - cols[prevcolpos].Color.G) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.G;
-                        double b = (cols[colpos].Color.B - cols[prevcolpos].Color.B) * pos / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.B;
+                        double r = (cols[colpos].Color.R - cols[prevcolpos].Color.R) * (pos - cols[prevcolpos].Position) / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.R;
+                        double g = (cols[colpos].Color.G - cols[prevcolpos].Color.G) * (pos - cols[prevcolpos].Position) / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.G;
+                        double b = (cols[colpos].Color.B - cols[prevcolpos].Color.B) * (pos - cols[prevcolpos].Position) / (cols[colpos].Position - cols[prevcolpos].Position) + cols[prevcolpos].Color.B;
                         ret[arrayidx] = new Color(r, g, b);
                         break;
                     }
