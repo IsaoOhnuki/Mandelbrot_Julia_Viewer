@@ -192,6 +192,7 @@ namespace Models
                 #region No Complex Code
                 double xmin = xpos - radius;
                 double ymin = ypos + radius;
+                double ymax = ypos + radius;
                 #endregion
 #endif
                 int i = 0;
@@ -224,7 +225,8 @@ namespace Models
                         #endregion
 #else
                         #region No Complex Code
-                        double y = j * radius * 2 / (resolution - 1) - ymin;
+                        double y = ymax - j * radius * 2 / (resolution - 1);
+                        //double y = j * radius * 2 / (resolution - 1) - ymin;
                         double a = x;
                         double b = y;
                         double a2 = a * a;
@@ -270,6 +272,7 @@ namespace Models
                 #region No Complex Code
                 double xmin = xpos - radius;
                 double ymin = ypos + radius;
+                double ymax = ypos + radius;
                 #endregion
 #endif
                 int i = 0;
@@ -301,7 +304,8 @@ namespace Models
                         #endregion
 #else
                         #region No Complex Code
-                        double y = j * radius * 2 / (resolution - 1) - ymin;
+                        //double y = j * radius * 2 / (resolution - 1) - ymin;
+                        double y = ymax - j * radius * 2 / (resolution - 1);
                         double a = x;
                         double b = y;
                         double a2 = a * a;
@@ -355,7 +359,7 @@ namespace Models
                 {
                     for (int i = 0; i < split; ++i)
                     {
-                        tasks.Add(Mandelbrot_Julia.Julia(-radius + julia * i, -radius + julia * j, 0, 0, 2, repert, size));
+                        tasks.Add(Mandelbrot_Julia.Julia(-radius + julia * i, radius - julia * j, 0, 0, 2, repert, size));
                     }
                 }
 
