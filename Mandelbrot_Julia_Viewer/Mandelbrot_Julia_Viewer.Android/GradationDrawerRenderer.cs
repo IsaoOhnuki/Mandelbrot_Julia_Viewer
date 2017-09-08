@@ -20,21 +20,14 @@ namespace Mandelbrot_Julia_Viewer.Droid
 {
     // http://qiita.com/croquette0212/items/24dc2b6de3730e831aab AndroidのSurfaceViewの基礎
 
-    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, Android.Views.SurfaceView>
+    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, Android.Views.SurfaceView>, ISurfaceHolderCallback
     {
-        private SurfaceViewCallback surfaceViewCallback;
-
-        public GradationDrawerRenderer()
-        {
-            surfaceViewCallback = new SurfaceViewCallback();
-        }
-
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
         {
             if (Control == null && e.NewElement != null)
             {
                 var ctrl = new Android.Views.SurfaceView(this.Context);
-                ctrl.Holder.AddCallback(new SurfaceViewCallback());
+                ctrl.Holder.AddCallback(this);
                 SetNativeControl(ctrl);
             }
             if (Control != null && e.OldElement != null)
@@ -49,15 +42,6 @@ namespace Mandelbrot_Julia_Viewer.Droid
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
-        }
-    }
-
-    public class SurfaceViewCallback : ISurfaceHolderCallback
-    {
-        public IntPtr Handle => throw new NotImplementedException();
-
-        public void Dispose()
-        {
         }
 
         public void SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] Format format, int width, int height)
