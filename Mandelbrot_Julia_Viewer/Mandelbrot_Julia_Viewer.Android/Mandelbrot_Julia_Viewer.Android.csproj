@@ -121,8 +121,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColorPickerRenderer.cs" />
-    <Compile Include="GradationDrawerRenderer.cs" />
+    <Compile Include="Renderer\ColorPickerRenderer.cs" />
+    <Compile Include="Renderer\DrawPanelRenderer.cs" />
+    <Compile Include="Renderer\GradationDrawerRenderer.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

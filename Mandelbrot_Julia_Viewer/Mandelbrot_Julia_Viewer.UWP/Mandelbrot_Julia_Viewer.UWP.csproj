@@ -98,6 +98,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Renderer\ColorPickerRenderer.cs" />
+    <Compile Include="Renderer\DrawPanelRenderer.cs" />
     <Compile Include="Renderer\GradationDrawerRenderer.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

@@ -40,6 +40,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ColorPicker.cs" />
+    <Compile Include="Controls\DrawPanel.cs" />
     <Compile Include="Controls\GradationDrawer.cs" />
     <Compile Include="Models\ColorResolution.cs" />
     <Compile Include="ViewModels\MJViewModel.cs" />

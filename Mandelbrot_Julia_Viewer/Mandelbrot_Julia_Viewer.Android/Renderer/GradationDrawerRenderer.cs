@@ -20,7 +20,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
 {
     // http://qiita.com/croquette0212/items/24dc2b6de3730e831aab AndroidのSurfaceViewの基礎
 
-    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, Android.Views.SurfaceView>, ISurfaceHolderCallback
+    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, SurfaceView>, ISurfaceHolderCallback
     {
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
         {
