@@ -34,20 +34,20 @@ namespace Models
                 }
             }
         }
-        private byte[] image;
-        public byte[] Image
-        {
-            get { return image; }
-            set
-            {
-                image = null;
-                if (value != null)
-                {
-                    image = new byte[value.GetLength(0)];
-                    value.CopyTo(image, 0);
-                }
-            }
-        }
+        //private byte[] image;
+        //public byte[] Image
+        //{
+        //    get { return image; }
+        //    set
+        //    {
+        //        image = null;
+        //        if (value != null)
+        //        {
+        //            image = new byte[value.GetLength(0)];
+        //            value.CopyTo(image, 0);
+        //        }
+        //    }
+        //}
         public Mandelbrot_Julia(Mandelbrot_Julia mj)
         {
             IPos = mj.IPos;
@@ -58,7 +58,7 @@ namespace Models
             Repert = mj.Repert;
             Resolution = mj.Resolution;
             Data = mj.Data;
-            Image = mj.Image;
+            //Image = mj.Image;
         }
         public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int split, /*int colorParette, */ColorResolutionStruct[] colors)
         {
