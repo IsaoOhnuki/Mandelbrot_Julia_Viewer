@@ -17,11 +17,11 @@ namespace Models
         public double IPos { get; set; }
         public double JPos { get; set; }
         public double Radius { get; set; }
-        public int Repert { get; set; }
+        public short Repert { get; set; }
         public int Resolution { get; set; }
         public int JuliaMapSplit { get; set; }
-        private int[] data;
-        public int[] Data
+        private short[] data;
+        public short[] Data
         {
             get { return data; }
             set
@@ -29,25 +29,11 @@ namespace Models
                 data = null;
                 if (value != null)
                 {
-                    data = new int[value.GetLength(0)];
+                    data = new short[value.GetLength(0)];
                     value.CopyTo(data, 0);
                 }
             }
         }
-        //private byte[] image;
-        //public byte[] Image
-        //{
-        //    get { return image; }
-        //    set
-        //    {
-        //        image = null;
-        //        if (value != null)
-        //        {
-        //            image = new byte[value.GetLength(0)];
-        //            value.CopyTo(image, 0);
-        //        }
-        //    }
-        //}
         public Mandelbrot_Julia(Mandelbrot_Julia mj)
         {
             IPos = mj.IPos;
@@ -58,9 +44,8 @@ namespace Models
             Repert = mj.Repert;
             Resolution = mj.Resolution;
             Data = mj.Data;
-            //Image = mj.Image;
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, int split, /*int colorParette, */ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, short repert, int resolution, int split, ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -71,7 +56,7 @@ namespace Models
             Resolution = resolution;
             JuliaMapSplit = split;
         }
-        public Mandelbrot_Julia(double xpos, double ypos, double radius, int repert, int resolution, /*int colorParette, */ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double xpos, double ypos, double radius, short repert, int resolution, ColorResolutionStruct[] colors)
         {
             IPos = double.NaN;
             JPos = double.NaN;
@@ -82,7 +67,7 @@ namespace Models
             Resolution = resolution;
             JuliaMapSplit = 0;
         }
-        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution, /*int colorParette, */ColorResolutionStruct[] colors)
+        public Mandelbrot_Julia(double ipos, double jpos, double xpos, double ypos, double radius, short repert, int resolution, ColorResolutionStruct[] colors)
         {
             IPos = ipos;
             JPos = jpos;
@@ -121,7 +106,7 @@ namespace Models
             return base.GetHashCode();
         }
 
-        public static Task<byte[]> Develop(int repert, int[] data, Color[] cols = null)
+        public static Task<byte[]> Develop(short repert, short[] data, Color[] cols = null)
         {
             return
             Task.Run<byte[]>(() =>
@@ -178,10 +163,10 @@ namespace Models
         }
 #endif
 
-        public static Task<int[]> Mandelbrot(double xpos, double ypos, double radius, int repert, int resolution)
+        public static Task<short[]> Mandelbrot(double xpos, double ypos, double radius, short repert, int resolution)
         {
-            return Task.Run<int[]>(() => {
-                int[] data = new int[resolution * resolution];
+            return Task.Run<short[]>(() => {
+                short[] data = new short[resolution * resolution];
 
 #if ComplexClassDefine
                 #region Complex Code
@@ -241,7 +226,7 @@ namespace Models
                         }
                         #endregion
 #endif
-                        data[j * resolution + i] = repert - count;
+                        data[j * resolution + i] = (short)(repert - count);
                         if (data[j * resolution + i] == repert)
                             data[j * resolution + i] = 0;
                     }
@@ -257,10 +242,10 @@ namespace Models
             });
         }
 
-        public static Task<int[]> Julia(double ipos, double jpos, double xpos, double ypos, double radius, int repert, int resolution)
+        public static Task<short[]> Julia(double ipos, double jpos, double xpos, double ypos, double radius, short repert, int resolution)
         {
-            return Task.Run<int[]>(() => {
-                int[] data = new int[resolution * resolution];
+            return Task.Run<short[]>(() => {
+                short[] data = new short[resolution * resolution];
 
 #if ComplexClassDefine
                 #region Complex Code
@@ -320,7 +305,7 @@ namespace Models
                         }
                         #endregion
 #endif
-                        data[j * resolution + i] = repert - count;
+                        data[j * resolution + i] = (short)(repert - count);
                         if (data[j * resolution + i] == repert)
                             data[j * resolution + i] = 0;
                     }
@@ -343,17 +328,17 @@ namespace Models
         //http://outside6.wp.xdomain.jp/2016/08/09/post-568/ TaskとawaitのデッドロックをTaskで回避する
         //http://qiita.com/acple@github/items/8f63aacb13de9954c5da Taskを極めろ！async/await完全攻略
 
-        public static Task<int[]> JuliaMap(double xpos, double ypos, double radius, int repert, int resolution, int split)
+        public static Task<short[]> JuliaMap(double xpos, double ypos, double radius, short repert, int resolution, int split)
         {
-            return Task.Run<int[]>(() => {
+            return Task.Run<short[]>(() => {
                 int size = resolution / split;
                 resolution = size * split;
 
-                int[] data = new int[resolution * resolution];
+                short[] data = new short[resolution * resolution];
 
                 double julia = radius * 2 / (split - 1);
 
-                List<Task<int[]>> tasks = new List<Task<int[]>>();
+                List<Task<short[]>> tasks = new List<Task<short[]>>();
 
                 for (int j = 0; j < split; ++j)
                 {

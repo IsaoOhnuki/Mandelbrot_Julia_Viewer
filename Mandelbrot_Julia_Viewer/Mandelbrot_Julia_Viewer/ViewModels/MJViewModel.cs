@@ -130,8 +130,8 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 OnPropertyChanged();
             }
         }
-        private int repert;
-        public int Repert
+        private short repert;
+        public short Repert
         {
             get { return repert; }
             set
