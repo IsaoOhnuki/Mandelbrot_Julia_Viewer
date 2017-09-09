@@ -14,20 +14,25 @@ using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using Android.Graphics;
 using System.ComponentModel;
+using Android.Graphics.Drawables;
 
 [assembly: ExportRenderer(typeof(GradationDrawer), typeof(Mandelbrot_Julia_Viewer.Droid.GradationDrawerRenderer))]
 namespace Mandelbrot_Julia_Viewer.Droid
 {
     // http://qiita.com/croquette0212/items/24dc2b6de3730e831aab AndroidのSurfaceViewの基礎
+    // http://furuya02.hatenablog.com/entry/2014/11/23/001448 Xamarin.Forms 描画で考慮すべき２つのこと
 
-    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, SurfaceView>, ISurfaceHolderCallback
+
+    public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, Android.Views.View>
+    //public class GradationDrawerRenderer : ViewRenderer<GradationDrawer, Android.Views.SurfaceView>, ISurfaceHolderCallback
     {
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
         {
             if (Control == null && e.NewElement != null)
             {
-                var ctrl = new Android.Views.SurfaceView(this.Context);
-                ctrl.Holder.AddCallback(this);
+                var ctrl = new Android.Views.View(this.Context);
+                //var ctrl = new Android.Views.SurfaceView(this.Context);
+                //ctrl.Holder.AddCallback(this);
                 SetNativeControl(ctrl);
             }
             if (Control != null && e.OldElement != null)
@@ -44,25 +49,40 @@ namespace Mandelbrot_Julia_Viewer.Droid
             base.OnElementPropertyChanged(sender, e);
         }
 
-        public void SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] Format format, int width, int height)
+        protected override void OnDraw(Canvas canvas)
         {
+            base.OnDraw(canvas);
+
+            var paint = new Paint();
+            paint.SetARGB(255, 200, 255, 0);
+            paint.SetStyle(Paint.Style.Stroke);
+            paint.StrokeWidth = 4;
+
+            ShapeDrawable _shape = new ShapeDrawable(new Android.Graphics.Drawables.Shapes.OvalShape());
+            _shape.Paint.Set(paint);
+            _shape.SetBounds(20, 20, 300, 200);
+            _shape.Draw(canvas);
         }
 
-        public void SurfaceCreated(ISurfaceHolder holder)
-        {
-            Paint paint = new Paint(PaintFlags.AntiAlias);
-            paint.Color = Android.Graphics.Color.Blue;
-            paint.SetStyle(Paint.Style.Fill);
+        //public void SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] Format format, int width, int height)
+        //{
+        //}
 
-            Canvas canvas = holder.LockCanvas();
-            canvas.DrawColor(Android.Graphics.Color.Black);
-            canvas.DrawCircle(100, 200, 50, paint);
-            holder.UnlockCanvasAndPost(canvas);
-        }
+        //public void SurfaceCreated(ISurfaceHolder holder)
+        //{
+        //    Paint paint = new Paint(PaintFlags.AntiAlias);
+        //    paint.Color = Android.Graphics.Color.Blue;
+        //    paint.SetStyle(Paint.Style.Fill);
 
-        public void SurfaceDestroyed(ISurfaceHolder holder)
-        {
-        }
+        //    Canvas canvas = holder.LockCanvas();
+        //    canvas.DrawColor(Android.Graphics.Color.Black);
+        //    canvas.DrawCircle(100, 200, 50, paint);
+        //    holder.UnlockCanvasAndPost(canvas);
+        //}
+
+        //public void SurfaceDestroyed(ISurfaceHolder holder)
+        //{
+        //}
     }
 
     //public class ColorPickerArrayAdapter : ArrayAdapter<ColorStruct>
