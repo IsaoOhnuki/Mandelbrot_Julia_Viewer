@@ -12,6 +12,8 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
 {
     // http://qiita.com/kiichi54321/items/7b7a7b0caa2f09ba4147 UWPのアプリを作っているうえで、早く知りたかったこと。
     // http://garicchi.com/?p=16481 プリンターを使って印刷するには
+    // http://www.buildinsider.net/mobile/xamarintips Xamarin逆引きTips Xamarinを利用して、主にAndroid／iOSアプリを開発する際に役立つ実践TIPS。
+
     public class MJViewModel : BindableObject
     {
         public class MJI
