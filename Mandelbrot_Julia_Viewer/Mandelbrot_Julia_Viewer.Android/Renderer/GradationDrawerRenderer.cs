@@ -72,21 +72,23 @@ namespace Mandelbrot_Julia_Viewer.Droid
             base.OnElementChanged(e);
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
 
             if (e.PropertyName == GradationDrawer.HeightProperty.PropertyName)
             {
+                Gradation = await GetGradation();
                 Invalidate();
             }
             if (e.PropertyName == GradationDrawer.WidthProperty.PropertyName)
             {
+                Gradation = await GetGradation();
                 Invalidate();
             }
         }
 
-        private void Colors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async void Colors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
@@ -102,36 +104,47 @@ namespace Mandelbrot_Julia_Viewer.Droid
                     ((GradationDrawer.ColPos)parette).PropertyChanged -= Colors_PropertyChangedAsync;
                 }
             }
+            Gradation = await GetGradation();
             Invalidate();
         }
 
-        private void Colors_PropertyChangedAsync(object sender, PropertyChangedEventArgs e)
+        private async void Colors_PropertyChangedAsync(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(GradationDrawer.ColPos.Color))
             {
+                Gradation = await GetGradation();
                 Invalidate();
             }
             if (e.PropertyName == nameof(GradationDrawer.ColPos.Position))
             {
+                Gradation = await GetGradation();
                 Invalidate();
             }
         }
 
         private void DrawGradation(Canvas canvas)
         {
-            Android.Graphics.Color[] grad = Element.CreateColorArray(Height).Select(x => new Android.Graphics.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
             Paint paint = new Paint(PaintFlags.AntiAlias);
 
             paint.Color = Android.Graphics.Color.Honeydew;
             paint.SetStyle(Paint.Style.Fill);
             canvas.DrawRect(new Rect(0, 0, Width, Height), paint);
-            for (int y = 0; y < Height; ++y)
+            for (int y = 0; y < Gradation?.Length; ++y)
             {
-                paint.Color = grad[y];
+                paint.Color = Gradation[y];
                 paint.SetStyle(Paint.Style.Stroke);
                 paint.StrokeWidth = 1;
-                canvas.DrawLine(0, y, (int)Width / 2, y, paint);
+                canvas.DrawLine(0, y, (int)Element.Width / 2, y, paint);
             }
+        }
+
+        public Android.Graphics.Color[] Gradation { get; set; }
+
+        private Task<Android.Graphics.Color[]> GetGradation()
+        {
+            return Task<Android.Graphics.Color[]>.Run(() => {
+                return Element.CreateColorArray((int)Element.Height).Select(x => new Android.Graphics.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
+            });
         }
 
 #if UseSurfaceView
