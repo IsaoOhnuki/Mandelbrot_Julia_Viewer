@@ -67,17 +67,18 @@ namespace Mandelbrot_Julia_Viewer.UWP
             base.OnElementChanged(e);
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
             // プロパティ値の変更を反映
             if (e.PropertyName == GradationDrawer.ColorsProperty.PropertyName)
             {
+                Gradation = await GetGradation((int)ActualHeight);
                 Control.Invalidate();
             }
         }
 
-        private void Colors_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void Colors_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(GradationDrawer.ColPos.Color))
             {
@@ -87,10 +88,11 @@ namespace Mandelbrot_Julia_Viewer.UWP
             {
 
             }
+            Gradation = await GetGradation((int)ActualHeight);
             Control.Invalidate();
         }
 
-        private void Colors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void Colors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
@@ -110,12 +112,14 @@ namespace Mandelbrot_Julia_Viewer.UWP
                     Children.RemoveAt(e.OldStartingIndex + l);
                 }
             }
+            Gradation = await GetGradation((int)ActualHeight);
             Control.Invalidate();
         }
 
-        private void GradationDrawerRenderer_SizeChanged(object sender, Windows.UI.Xaml.SizeChangedEventArgs e)
+        private async void GradationDrawerRenderer_SizeChanged(object sender, Windows.UI.Xaml.SizeChangedEventArgs e)
         {
-
+            Gradation = await GetGradation((int)e.NewSize.Height);
+            Control.Invalidate();
         }
 
         private void GradationDrawerRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -125,12 +129,20 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
         private void GradationDrawerRenderer_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
-            var cols = Element.CreateColorArray((int)ActualHeight).Select(x => new Windows.UI.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
             args.DrawingSession.FillRectangle(new Windows.Foundation.Rect(0, 0, ActualWidth, ActualHeight), Windows.UI.Colors.Honeydew);
-            for (int y = 0; y < (int)ActualHeight; ++y)
+            for (int y = 0; y < Gradation?.Length; ++y)
             {
-                args.DrawingSession.DrawLine(0, y, (int)ActualWidth / 2, y, cols[y]);
+                args.DrawingSession.DrawLine(0, y, (int)ActualWidth / 2, y, Gradation[y]);
             }
+        }
+
+        public Windows.UI.Color[] Gradation { get; set; }
+
+        private Task<Windows.UI.Color[]> GetGradation(int size)
+        {
+            return Task<Windows.UI.Color[]>.Run(() => {
+                return Element.CreateColorArray(size).Select(x => new Windows.UI.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
+            });
         }
     }
 }
