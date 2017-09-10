@@ -1,12 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Behaviors="clr-namespace:Behaviors;assembly=Mandelbrot_Julia_Viewer"
              x:Class="Mandelbrot_Julia_Viewer.Views.DrawPage">
     <ContentPage.Content>
+        <!-- https://forums.xamarin.com/discussion/17767/touch-coordinates-in-tapgesturerecognizer TapGestureRecognizerで座標をタッチしますか？ -->
         <StackLayout VerticalOptions="FillAndExpand" BackgroundColor="Chocolate">
             <Slider x:Name="Slider1" Value="{Binding Rate}" HorizontalOptions="FillAndExpand" Maximum="5" Minimum="1"/>
             <ScrollView Orientation="Both" HorizontalOptions="Center" VerticalOptions="Center">
-                <AbsoluteLayout BackgroundColor="Cornsilk">
+                <AbsoluteLayout BackgroundColor="Cornsilk" Behaviors:TappedAndPoint.Tapped="{Binding CanvasTappedCommand}">
                     <Image x:Name="ImageControl" Source="{Binding ImageSource}" AbsoluteLayout.LayoutBounds="{Binding ImageBound}"/>
                 </AbsoluteLayout>
             </ScrollView>

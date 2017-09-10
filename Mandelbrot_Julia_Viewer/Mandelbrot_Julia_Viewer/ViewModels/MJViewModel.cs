@@ -179,6 +179,12 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
 
         }
 
+        public Command<Point> CanvasTappedCommand { get { return new Command<Point>((p) => OnCanvasTapped(p)); } }
+        public void OnCanvasTapped(Point p)
+        {
+            // your event handling logic
+        }
+
         public MJViewModel()
         {
             UndoList = new UndoList<MJI>();
