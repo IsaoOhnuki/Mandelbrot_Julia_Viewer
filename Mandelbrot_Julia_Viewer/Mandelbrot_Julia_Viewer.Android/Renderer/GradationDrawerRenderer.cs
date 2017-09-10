@@ -72,20 +72,17 @@ namespace Mandelbrot_Julia_Viewer.Droid
             base.OnElementChanged(e);
         }
 
-        protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
+        }
 
-            if (e.PropertyName == GradationDrawer.HeightProperty.PropertyName)
-            {
-                Gradation = await GetGradation();
-                Invalidate();
-            }
-            if (e.PropertyName == GradationDrawer.WidthProperty.PropertyName)
-            {
-                Gradation = await GetGradation();
-                Invalidate();
-            }
+        protected override async void OnSizeChanged(int w, int h, int oldw, int oldh)
+        {
+            base.OnSizeChanged(w, h, oldw, oldh);
+
+            Gradation = await GetGradation();
+            Invalidate();
         }
 
         private async void Colors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -134,7 +131,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
                 paint.Color = Gradation[y];
                 paint.SetStyle(Paint.Style.Stroke);
                 paint.StrokeWidth = 1;
-                canvas.DrawLine(0, y, (int)Element.Width / 2, y, paint);
+                canvas.DrawLine(0, y, (int)Width / 2, y, paint);
             }
         }
 
@@ -143,7 +140,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
         private Task<Android.Graphics.Color[]> GetGradation()
         {
             return Task<Android.Graphics.Color[]>.Run(() => {
-                return Element.CreateColorArray((int)Element.Height).Select(x => new Android.Graphics.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
+                return Element.CreateColorArray((int)Height).Select(x => new Android.Graphics.Color { A = 255, R = (byte)(x.R * 255.0), G = (byte)(x.G * 255.0), B = (byte)(x.B * 255.0) }).ToArray();
             });
         }
 
