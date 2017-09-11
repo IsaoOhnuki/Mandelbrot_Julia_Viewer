@@ -9,17 +9,17 @@
                 <Button x:Name="BtnUndo" Text="Undo" Command="{Binding Undo}" IsEnabled="{Binding CanUndo}"/>
                 <Button x:Name="BtnRedo" Text="Redo" Command="{Binding Redo}" IsEnabled="{Binding CanRedo}"/>
                 <Label Text="XPos" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryXPos" Text="{Binding XPos, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryXPos" Text="{Binding XPos}" VerticalOptions="Center"/>
                 <Label Text="YPos" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryYPos" Text="{Binding YPos, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryYPos" Text="{Binding YPos}" VerticalOptions="Center"/>
                 <Label Text="Radius" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryRadius" Text="{Binding Radius, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryRadius" Text="{Binding Radius}" VerticalOptions="Center"/>
                 <Label Text="Repert" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryRepert" Text="{Binding Repert, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryRepert" Text="{Binding Repert}" VerticalOptions="Center"/>
                 <Label Text="Resolution" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryResolution" Text="{Binding Resolution, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryResolution" Text="{Binding Resolution}" VerticalOptions="Center"/>
                 <Label Text="JuliaMapSplit" VerticalTextAlignment="Center"/>
-                <Entry x:Name="EntryJuliaMapSplit" Text="{Binding JuliaMapSplit, Mode=TwoWay}" VerticalOptions="Center"/>
+                <Entry x:Name="EntryJuliaMapSplit" Text="{Binding JuliaMapSplit}" VerticalOptions="Center"/>
                 <Label Text="ColorParette" VerticalTextAlignment="Center"/>
                 <Switch IsToggled="{Binding UseColorParette}"/>
                 <Button x:Name="BtnMandelbrot" Text="Mandelbrot" Command="{Binding MandelbrotRun}"/>

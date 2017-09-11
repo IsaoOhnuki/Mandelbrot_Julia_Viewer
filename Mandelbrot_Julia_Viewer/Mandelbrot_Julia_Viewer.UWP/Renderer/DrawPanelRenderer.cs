@@ -7,6 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms.Platform.UWP;
 using System.ComponentModel;
+using Microsoft.Graphics.Canvas;
+using Windows.Storage.Pickers;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.UWP.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.UWP
@@ -47,7 +52,17 @@ namespace Mandelbrot_Julia_Viewer.UWP
             switch (invalidType)
             {
                 case InvalidType.Image:
-                    args.DrawingSession.DrawImage(Element.Image);
+                    if (Element.Image is byte[])
+                    {
+                        CanvasBitmap image = CanvasBitmap.CreateFromBytes(Control, Element.Image as byte[], 4096, 4096, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized);
+                        args.DrawingSession.DrawImage(image);
+                        //using (InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream())
+                        //{
+                        //    await randomAccessStream.WriteAsync((Element.Image as byte[]).AsBuffer());
+                        //    CanvasBitmap image = await CanvasBitmap.LoadAsync(Control, randomAccessStream);
+                        //    args.DrawingSession.DrawImage(image);
+                        //}
+                    }
                     break;
             }
         }
