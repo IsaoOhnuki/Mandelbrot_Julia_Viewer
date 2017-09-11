@@ -12,11 +12,30 @@ using Xamarin.Forms.Platform.Android;
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.Droid.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.Droid
 {
-    class DrawPanelRenderer : ViewRenderer<GradationDrawer, SurfaceView>
+    class DrawPanelRenderer : ViewRenderer<GradationDrawer, Android.Views.View>
     {
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
         {
+            if (Control == null && e.NewElement != null)
+            {
+                var ctrl = new Android.Views.View(this.Context);
+
+                SetNativeControl(ctrl);
+            }
+            if (Control != null && e.OldElement != null)
+            {
+                Control.ContextClick -= Control_ContextClick;
+            }
+            if (Control != null && e.NewElement != null)
+            {
+                Control.ContextClick += Control_ContextClick;
+            }
             base.OnElementChanged(e);
+        }
+
+        private void Control_ContextClick(object sender, ContextClickEventArgs e)
+        {
+
         }
 
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
