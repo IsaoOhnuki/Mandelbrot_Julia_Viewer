@@ -9,31 +9,46 @@ namespace Controls
 {
     public class DrawPanel : View
     {
-        public event EventHandler<ImageChangedEventArgs> ImageChanged;
-
-        // BindablePropertyを追加
-        public object Image
+        public byte[] ImageData
         {
-            get { return GetValue(ImageProperty); }
-            set { SetValue(ImageProperty, value); }
+            get { return (byte[])GetValue(ImageDataProperty); }
+            set { SetValue(ImageDataProperty, value); }
         }
 
-        public static readonly BindableProperty ImageProperty = BindableProperty.Create(
-            nameof(Image),
-            typeof(object),
+        public static readonly BindableProperty ImageDataProperty = BindableProperty.Create(
+            nameof(ImageData),
+            typeof(byte[]),
             typeof(DrawPanel),
-            default(object),
+            default(byte[]),
             propertyChanged: (bindable, oldValue, newValue) => {
-                ((DrawPanel)bindable).ImageChanged?.Invoke(bindable, new ImageChangedEventArgs((object)newValue));
             });
-    }
 
-    public class ImageChangedEventArgs : EventArgs
-    {
-        public ImageChangedEventArgs(object newValue)
+        public int ImageWidth
         {
-            NewValue = newValue;
+            get { return (int)GetValue(ImageWidthProperty); }
+            set { SetValue(ImageWidthProperty, value); }
         }
-        public object NewValue { get; private set; }
+
+        public static readonly BindableProperty ImageWidthProperty = BindableProperty.Create(
+            nameof(ImageWidth),
+            typeof(int),
+            typeof(DrawPanel),
+            default(int),
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
+
+        public int ImageHeight
+        {
+            get { return (int)GetValue(ImageHeightProperty); }
+            set { SetValue(ImageHeightProperty, value); }
+        }
+
+        public static readonly BindableProperty ImageHeightProperty = BindableProperty.Create(
+            nameof(ImageHeight),
+            typeof(int),
+            typeof(DrawPanel),
+            default(int),
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
     }
 }

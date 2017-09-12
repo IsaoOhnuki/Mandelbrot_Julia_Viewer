@@ -18,12 +18,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
 {
     class DrawPanelRenderer : ViewRenderer<DrawPanel, CanvasControl>
     {
-        enum InvalidType
-        {
-            None,
-            Image,
-        }
-        InvalidType invalidType { get; set; }
+        public CanvasBitmap Image { get; set; }
+
+        public double Scale { get; set; } = 1;
 
         protected override void OnElementChanged(ElementChangedEventArgs<DrawPanel> e)
         {
@@ -36,40 +33,49 @@ namespace Mandelbrot_Julia_Viewer.UWP
             {
                 Control.Draw -= Control_Draw;
                 Control.Tapped -= Control_Tapped;
-                e.OldElement.ImageChanged -= Element_ImageChanged;
             }
             if (Control != null && e.NewElement != null)
             {
                 Control.Draw += Control_Draw;
                 Control.Tapped += Control_Tapped;
-                e.NewElement.ImageChanged += Element_ImageChanged;
+                Control.ManipulationDelta += Control_ManipulationDelta;
+                Control.PointerWheelChanged += Control_PointerWheelChanged;
             }
             base.OnElementChanged(e);
         }
 
-        private void Control_Draw(CanvasControl sender, CanvasDrawEventArgs args)
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            switch (invalidType)
+            base.OnElementPropertyChanged(sender, e);
+            if (e.PropertyName == DrawPanel.ImageDataProperty.PropertyName
+                || e.PropertyName == DrawPanel.ImageWidthProperty.PropertyName
+                || e.PropertyName == DrawPanel.ImageHeightProperty.PropertyName)
             {
-                case InvalidType.Image:
-                    if (Element.Image is byte[])
-                    {
-                        CanvasBitmap image = CanvasBitmap.CreateFromBytes(Control, Element.Image as byte[], 4096, 4096, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized);
-                        args.DrawingSession.DrawImage(image);
-                        //using (InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream())
-                        //{
-                        //    await randomAccessStream.WriteAsync((Element.Image as byte[]).AsBuffer());
-                        //    CanvasBitmap image = await CanvasBitmap.LoadAsync(Control, randomAccessStream);
-                        //    args.DrawingSession.DrawImage(image);
-                        //}
-                    }
-                    break;
+                if (Element.ImageData.Length == Element.ImageWidth * Element.ImageHeight * 4)
+                {
+                    Image = CanvasBitmap.CreateFromBytes(Control, Element.ImageData, Element.ImageWidth, Element.ImageHeight, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96);
+                    Control.Invalidate();
+                }
             }
         }
 
-        private void Element_ImageChanged(object sender, ImageChangedEventArgs e)
+        private void Control_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            invalidType = InvalidType.Image;
+            int delta = e.GetCurrentPoint(Control).Properties.MouseWheelDelta;
+            if (delta > 0)
+            {
+                Scale *= 0.2 * delta / 120 + 1;
+            }
+            else
+            {
+                Scale += 0.2 * delta / 120 * Scale;
+            }
+            Control.Invalidate();
+        }
+
+        private void Control_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+        {
+            Scale = Math.Max(e.Delta.Translation.X, e.Delta.Translation.Y);
             Control.Invalidate();
         }
 
@@ -78,9 +84,24 @@ namespace Mandelbrot_Julia_Viewer.UWP
             e.GetPosition(Control);
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Control_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
-            base.OnElementPropertyChanged(sender, e);
+            double destWidth = (double)Element.ImageWidth * Scale;
+            double destHeight = (double)Element.ImageHeight * Scale;
+            if (destWidth < Control.ActualWidth || destWidth < destHeight)
+            {
+                destWidth = Control.ActualWidth;
+                Scale = Control.ActualWidth / Element.ImageWidth;
+                destHeight = Element.ImageHeight * Scale;
+            }
+            if (destHeight < Control.ActualHeight || destHeight < destWidth)
+            {
+                destHeight = Control.ActualHeight;
+                Scale = Control.ActualHeight / Element.ImageHeight;
+                destWidth = Element.ImageWidth * Scale;
+            }
+            if (Image != null)
+                args.DrawingSession.DrawImage(Image, new Windows.Foundation.Rect(0, 0, destWidth, destHeight), new Windows.Foundation.Rect(0, 0, Element.ImageWidth, Element.ImageHeight));
         }
     }
 }

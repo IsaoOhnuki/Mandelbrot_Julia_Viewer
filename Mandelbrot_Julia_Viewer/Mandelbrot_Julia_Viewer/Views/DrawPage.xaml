@@ -6,15 +6,13 @@
              x:Class="Mandelbrot_Julia_Viewer.Views.DrawPage">
     <ContentPage.Content>
         <!-- https://forums.xamarin.com/discussion/17767/touch-coordinates-in-tapgesturerecognizer TapGestureRecognizerで座標をタッチしますか？ -->
-        <StackLayout VerticalOptions="FillAndExpand" BackgroundColor="Chocolate">
+        <Controls:DrawPanel x:Name="ImageControl" WidthRequest="{Binding Resolution}" HeightRequest="{Binding Resolution}" ImageData="{Binding Image}" ImageWidth="{Binding Resolution}" ImageHeight="{Binding Resolution}"/>
+        <!--<StackLayout VerticalOptions="FillAndExpand" BackgroundColor="Chocolate">
             <Slider x:Name="Slider1" Value="{Binding Rate}" HorizontalOptions="FillAndExpand" Maximum="5" Minimum="1"/>
             <ScrollView Orientation="Both" HorizontalOptions="Center" VerticalOptions="Center">
-                <AbsoluteLayout BackgroundColor="Cornsilk">
-                    <!--<Image x:Name="ImageControl" Source="{Binding ImageSource}" AbsoluteLayout.LayoutBounds="{Binding ImageBound}"/>-->
-                    <Controls:DrawPanel x:Name="ImageControl" Image="{Binding Image}" AbsoluteLayout.LayoutBounds="{Binding ImageBound}"/>
-                </AbsoluteLayout>
+                <Controls:DrawPanel x:Name="ImageControl" WidthRequest="{Binding Resolution}" HeightRequest="{Binding Resolution}" ImageData="{Binding Image}" ImageWidth="{Binding Resolution}" ImageHeight="{Binding Resolution}"/>
             </ScrollView>
             <ActivityIndicator BindingContext="{x:Reference ImageControl}" IsRunning="{Binding IsLoading}" />
-        </StackLayout>
+        </StackLayout>-->
     </ContentPage.Content>
 </ContentPage>
