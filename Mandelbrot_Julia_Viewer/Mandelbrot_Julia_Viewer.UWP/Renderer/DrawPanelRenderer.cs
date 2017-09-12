@@ -27,12 +27,15 @@ namespace Mandelbrot_Julia_Viewer.UWP
             if (Control == null && e.NewElement != null)
             {
                 var ctrl = new CanvasControl();
+                ctrl.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
                 SetNativeControl(ctrl);
             }
             if (Control != null && e.OldElement != null)
             {
                 Control.Draw -= Control_Draw;
                 Control.Tapped -= Control_Tapped;
+                Control.ManipulationDelta -= Control_ManipulationDelta;
+                Control.PointerWheelChanged -= Control_PointerWheelChanged;
             }
             if (Control != null && e.NewElement != null)
             {
@@ -75,7 +78,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
         private void Control_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
         {
-            Scale = Math.Max(e.Delta.Translation.X, e.Delta.Translation.Y);
+            Scale *= e.Delta.Scale;
             Control.Invalidate();
         }
 
