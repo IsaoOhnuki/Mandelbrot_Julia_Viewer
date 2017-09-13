@@ -9,6 +9,8 @@ namespace Controls
 {
     public class DrawPanel : View
     {
+        // http://qiita.com/AyaseSH/items/52768d4a9f22f417642f Xamarin.FormsでPinchGestureRecognizerのユーザー操作について
+
         public byte[] ImageData
         {
             get { return (byte[])GetValue(ImageDataProperty); }

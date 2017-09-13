@@ -21,6 +21,8 @@ namespace Mandelbrot_Julia_Viewer.UWP
         public CanvasBitmap Image { get; set; }
 
         public double Scale { get; set; } = 1;
+        public double XPos { get; set; } = 0;
+        public double YPos { get; set; } = 0;
 
         protected override void OnElementChanged(ElementChangedEventArgs<DrawPanel> e)
         {
@@ -65,6 +67,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
         private void Control_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             int delta = e.GetCurrentPoint(Control).Properties.MouseWheelDelta;
+            double oldScale = Scale;
             if (delta > 0)
             {
                 Scale *= 0.2 * delta / 120 + 1;
@@ -89,22 +92,24 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
         private void Control_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
-            double destWidth = (double)Element.ImageWidth * Scale;
-            double destHeight = (double)Element.ImageHeight * Scale;
-            if (destWidth < Control.ActualWidth || destWidth < destHeight)
-            {
-                destWidth = Control.ActualWidth;
-                Scale = Control.ActualWidth / Element.ImageWidth;
-                destHeight = Element.ImageHeight * Scale;
-            }
-            if (destHeight < Control.ActualHeight || destHeight < destWidth)
-            {
-                destHeight = Control.ActualHeight;
-                Scale = Control.ActualHeight / Element.ImageHeight;
-                destWidth = Element.ImageWidth * Scale;
-            }
             if (Image != null)
+            {
+                double destWidth = (double)Element.ImageWidth * Scale;
+                double destHeight = (double)Element.ImageHeight * Scale;
+                if (destWidth < Control.ActualWidth || destWidth < destHeight)
+                {
+                    destWidth = Control.ActualWidth;
+                    Scale = Control.ActualWidth / Element.ImageWidth;
+                    destHeight = Element.ImageHeight * Scale;
+                }
+                if (destHeight < Control.ActualHeight || destHeight < destWidth)
+                {
+                    destHeight = Control.ActualHeight;
+                    Scale = Control.ActualHeight / Element.ImageHeight;
+                    destWidth = Element.ImageWidth * Scale;
+                }
                 args.DrawingSession.DrawImage(Image, new Windows.Foundation.Rect(0, 0, destWidth, destHeight), new Windows.Foundation.Rect(0, 0, Element.ImageWidth, Element.ImageHeight));
+            }
         }
     }
 }
