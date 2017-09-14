@@ -12,6 +12,7 @@ using Windows.Storage.Pickers;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Xamarin.Forms;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.UWP.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.UWP
@@ -19,10 +20,39 @@ namespace Mandelbrot_Julia_Viewer.UWP
     class DrawPanelRenderer : ViewRenderer<DrawPanel, CanvasControl>
     {
         public CanvasBitmap Image { get; set; }
+        private Point origin;
+        public Point Origin
+        {
+            get { return origin; }
+            set
+            {
+                origin = value;
+            }
+        }
+        private double scale = 1;
+        public double Scale
+        {
+            get { return scale; }
+            set
+            {
+                scale = value;
+            }
+        }
 
-        public double Scale { get; set; } = 1;
-        public double XPos { get; set; } = 0;
-        public double YPos { get; set; } = 0;
+        public async Task<bool> UpdateImageASync()
+        {
+            if (Element.ImageDataValid)
+            {
+                DrawPanel.DrawImage image = await Task<DrawPanel.DrawImage>.Factory.StartNew(
+                    sz => Element.GetDrawImage(Origin, Scale, (Size)sz, false),
+                    new Size(Control.ActualWidth / 2, Control.ActualHeight / 2));
+                Scale = image.Scale;
+                Origin = image.Origin;
+                Image = await Task.Run<CanvasBitmap>(() => CanvasBitmap.CreateFromBytes(Control, Element.ImageData, image.ImageSizeX, image.ImageSizeY, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96));
+                return true;
+            }
+            return false;
+        }
 
         protected override void OnElementChanged(ElementChangedEventArgs<DrawPanel> e)
         {
@@ -49,22 +79,21 @@ namespace Mandelbrot_Julia_Viewer.UWP
             base.OnElementChanged(e);
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
             if (e.PropertyName == DrawPanel.ImageDataProperty.PropertyName
+                || e.PropertyName == DrawPanel.ImagePixelOfByteSizeProperty.PropertyName
+                || e.PropertyName == DrawPanel.ImageOriginProperty.PropertyName
                 || e.PropertyName == DrawPanel.ImageWidthProperty.PropertyName
                 || e.PropertyName == DrawPanel.ImageHeightProperty.PropertyName)
             {
-                if (Element.ImageData.Length == Element.ImageWidth * Element.ImageHeight * 4)
-                {
-                    Image = CanvasBitmap.CreateFromBytes(Control, Element.ImageData, Element.ImageWidth, Element.ImageHeight, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96);
+                if (await UpdateImageASync())
                     Control.Invalidate();
-                }
             }
         }
 
-        private void Control_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private async void Control_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             int delta = e.GetCurrentPoint(Control).Properties.MouseWheelDelta;
             double oldScale = Scale;
@@ -76,13 +105,15 @@ namespace Mandelbrot_Julia_Viewer.UWP
             {
                 Scale += 0.2 * delta / 120 * Scale;
             }
-            Control.Invalidate();
+            if (await UpdateImageASync())
+                Control.Invalidate();
         }
 
-        private void Control_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
+        private async void Control_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
         {
             Scale *= e.Delta.Scale;
-            Control.Invalidate();
+            if (await UpdateImageASync())
+                Control.Invalidate();
         }
 
         private void Control_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -94,21 +125,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
         {
             if (Image != null)
             {
-                double destWidth = (double)Element.ImageWidth * Scale;
-                double destHeight = (double)Element.ImageHeight * Scale;
-                if (destWidth < Control.ActualWidth || destWidth < destHeight)
-                {
-                    destWidth = Control.ActualWidth;
-                    Scale = Control.ActualWidth / Element.ImageWidth;
-                    destHeight = Element.ImageHeight * Scale;
-                }
-                if (destHeight < Control.ActualHeight || destHeight < destWidth)
-                {
-                    destHeight = Control.ActualHeight;
-                    Scale = Control.ActualHeight / Element.ImageHeight;
-                    destWidth = Element.ImageWidth * Scale;
-                }
-                args.DrawingSession.DrawImage(Image, new Windows.Foundation.Rect(0, 0, destWidth, destHeight), new Windows.Foundation.Rect(0, 0, Element.ImageWidth, Element.ImageHeight));
+                args.DrawingSession.DrawImage(Image);
             }
         }
     }
