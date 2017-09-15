@@ -69,6 +69,8 @@ namespace Controls
             else
             {
                 ret.DrawRect = new Rectangle((Diameter.Width - (ImageWidth * Scale)) / 2, (Diameter.Height - (ImageHeight * Scale)) / 2, ImageWidth * Scale, ImageHeight * Scale);
+                ret.ImageSizeX = ImageWidth;
+                ret.ImageSizeY = ImageHeight;
             }
 
             int startX = (int)(ImageWidth / 2 + Origin.X) - ret.ImageSizeX / 2;
