@@ -24,6 +24,8 @@ namespace Mandelbrot_Julia_Viewer.UWP
 {
     class DrawPanelRenderer : ViewRenderer<DrawPanel, CanvasControl>
     {
+        Windows.UI.Input.GestureRecognizer recognizer;
+
         public CanvasBitmap Image { get; set; }
         public Size ImageSize { get; set; }
         public Windows.Foundation.Rect DrawRect { get; set; }
@@ -73,11 +75,18 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 var ctrl = new CanvasControl();
                 ctrl.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
                 SetNativeControl(ctrl);
+
+                recognizer = new Windows.UI.Input.GestureRecognizer();
+                recognizer.GestureSettings = GestureSettings.ManipulationTranslateX
+                    | GestureSettings.ManipulationTranslateY
+                    | GestureSettings.ManipulationRotate
+                    | GestureSettings.ManipulationTranslateInertia
+                    | GestureSettings.ManipulationRotateInertia;
             }
             if (Control != null && e.OldElement != null)
             {
                 Control.Draw -= Control_Draw;
-                Control.Tapped -= Control_Tapped;
+                Control.SizeChanged -= Control_SizeChanged;
                 Control.ManipulationDelta -= Control_ManipulationDelta;
                 Control.PointerWheelChanged -= Control_PointerWheelChanged;
             }
@@ -85,17 +94,71 @@ namespace Mandelbrot_Julia_Viewer.UWP
             {
                 Control.Draw += Control_Draw;
                 Control.SizeChanged += Control_SizeChanged;
-                Control.Tapped += Control_Tapped;
                 Control.ManipulationDelta += Control_ManipulationDelta;
                 Control.PointerWheelChanged += Control_PointerWheelChanged;
-                Control.DragStarting += Control_DragStarting;
+
+                Control.PointerPressed += OnPointerPressed;
+                Control.PointerMoved += OnPointerMoved;
+                Control.PointerReleased += OnPointerReleased;
+                Control.PointerCanceled += OnPointerCanceled;
+
+                recognizer.ManipulationInertiaStarting += OnManipulationInertiaStarting;
+                recognizer.ManipulationStarted += OnManipulationStarted;
+                recognizer.ManipulationUpdated += OnManipulationUpdated;
+                recognizer.ManipulationCompleted += OnManipulationCompleted;
             }
             base.OnElementChanged(e);
         }
 
-        private void Control_DragStarting(Windows.UI.Xaml.UIElement sender, Windows.UI.Xaml.DragStartingEventArgs args)
+        void OnPointerPressed(object sender, PointerRoutedEventArgs args)
         {
-            throw new NotImplementedException();
+            Control.CapturePointer(args.Pointer);
+            recognizer.ProcessDownEvent(args.GetCurrentPoint(Control));
+        }
+
+        void OnPointerMoved(object sender, PointerRoutedEventArgs args)
+        {
+            recognizer.ProcessMoveEvents(args.GetIntermediatePoints(Control));
+        }
+
+        void OnPointerReleased(object sender, PointerRoutedEventArgs args)
+        {
+            recognizer.ProcessUpEvent(args.GetCurrentPoint(Control));
+            Control.ReleasePointerCapture(args.Pointer);
+        }
+
+        void OnPointerCanceled(object sender, PointerRoutedEventArgs args)
+        {
+            recognizer.CompleteGesture();
+            Control.ReleasePointerCapture(args.Pointer);
+        }
+
+        void OnManipulationInertiaStarting(object sender, ManipulationInertiaStartingEventArgs e)
+        {
+        }
+
+        void OnManipulationStarted(object sender, ManipulationStartedEventArgs e)
+        {
+        }
+
+        void OnManipulationUpdated(object sender, ManipulationUpdatedEventArgs e)
+        {
+            //previousTransform.Matrix = cumulativeTransform.Value;
+
+            //// Get the center point of the manipulation for rotation
+            //Point center = new Point(e.Position.X, e.Position.Y);
+            //deltaTransform.CenterX = center.X;
+            //deltaTransform.CenterY = center.Y;
+
+            //// Look at the Delta property of the ManipulationDeltaRoutedEventArgs to retrieve
+            //// the rotation, X, and Y changes
+            //deltaTransform.Rotation = e.Delta.Rotation;
+            //deltaTransform.TranslateX = e.Delta.Translation.X;
+            //deltaTransform.TranslateY = e.Delta.Translation.Y;
+        }
+
+        void OnManipulationCompleted(object sender, ManipulationCompletedEventArgs e)
+        {
         }
 
         protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -143,11 +206,6 @@ namespace Mandelbrot_Julia_Viewer.UWP
             Scale *= e.Delta.Scale;
             if (UpdateImage())
                 Control.Invalidate();
-        }
-
-        private void Control_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
-        {
-            e.GetPosition(Control);
         }
 
         private void Control_Draw(CanvasControl sender, CanvasDrawEventArgs args)
