@@ -11,13 +11,14 @@ namespace Controls
     {
         // http://qiita.com/AyaseSH/items/52768d4a9f22f417642f Xamarin.FormsでPinchGestureRecognizerのユーザー操作について
 
-        private Rectangle viewRect;
-        public Rectangle ViewRect
+        private Size viewSize;
+        public Size ViewSize
         {
-            get { return viewRect; }
+            get { return viewSize; }
             set
             {
-                viewRect = value;
+                viewSize = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(DeviceImage));
             }
         }
@@ -29,6 +30,7 @@ namespace Controls
             set
             {
                 viewOrigin = value;
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(DeviceImage));
             }
         }
@@ -57,13 +59,26 @@ namespace Controls
                 //drawRect.Width = width;
                 //drawRect.Height = height;
 
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(DeviceImage));
+            }
+        }
+
+        public Rectangle ViewRect
+        {
+            get
+            {
+                return new Rectangle
+                {
+                    X = 
+                }
             }
         }
 
         public class DeviceImageStruct
         {
             public object Image { get; set; }
+            public Rectangle ViewRect { get; set; }
             public Rectangle DrawRect { get; set; }
         }
 
