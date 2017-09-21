@@ -9,7 +9,80 @@ namespace Controls
 {
     public class DrawPanel : View
     {
+        public struct Matrix2
+        {
+            double m11;
+            double m12;
+            double m13;
+            double m21;
+            double m22;
+            double m23;
+            double dx;
+            double dy;
+            double dd;
+            public static Matrix2 operator *(Matrix2 l, Matrix2 r)
+            {
+                return new Matrix2();
+            }
+            public Matrix2(double m11, double m12, double m21, double m22, double dx, double dy)
+            {
+                this.m11 = m11;
+                this.m12 = m12;
+                this.m13 = 0;
+                this.m21 = m21;
+                this.m22 = m22;
+                this.m23 = 0;
+                this.dx = dx;
+                this.dy = dy;
+                this.dd = 1;
+            }
+            public static Size Calc(Size point, Matrix2 matrix)
+            {
+                return new Size { Width = point.Width * matrix.m11 + point.Width * matrix.m12 + matrix.dx, Height = point.Height * matrix.m21 + point.Height * matrix.m22 + matrix.dy };
+            }
+            public static Point Calc(Point point, Matrix2 matrix)
+            {
+                return new Point { X = point.X * matrix.m11 + point.X * matrix.m12 + matrix.dx, Y = point.Y * matrix.m21 + point.Y * matrix.m22 + matrix.dy };
+            }
+            public static Point Enlargement(Point point, double x, double y)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = x, m12 = 0, m21 = 0, m22 = y, dx = 0, dy = 0 });
+            }
+            public static Point Move(Point point, double x, double y)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = 1, m12 = 0, m21 = 0, m22 = 1, dx = x, dy = y });
+            }
+            public static Point Rotate(Point point, double o)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = Math.Cos(o), m12 = -Math.Sin(o), m21 = Math.Sin(o), m22 = Math.Cos(o), dx = 0, dy = 0 });
+            }
+            public static Size Enlargement(Size size, double x, double y)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = x, m12 = 0, m21 = 0, m22 = y, dx = 0, dy = 0 });
+            }
+            public static Size Move(Size size, double x, double y)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = 1, m12 = 0, m21 = 0, m22 = 1, dx = x, dy = y });
+            }
+            public static Size Rotate(Size size, double o)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = Math.Cos(o), m12 = -Math.Sin(o), m21 = Math.Sin(o), m22 = Math.Cos(o), dx = 0, dy = 0 });
+            }
+        }
+
         // http://qiita.com/AyaseSH/items/52768d4a9f22f417642f Xamarin.FormsでPinchGestureRecognizerのユーザー操作について
+
+        private Rectangle viewRect;
+        public Rectangle ViewRect
+        {
+            get { return viewRect; }
+            set
+            {
+                viewRect = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DeviceImage));
+            }
+        }
 
         private Size viewSize;
         public Size ViewSize
@@ -41,38 +114,18 @@ namespace Controls
             get { return viewScale; }
             set
             {
-                double oldScale = ViewScale;
                 viewScale = value;
-
-                //if (scale.Scale < 0.001)
-                //    scale.Scale = 0.001;
-
-                //double width = DrawImage.ImageSizeX * Scale.Scale;
-                //double height = DrawImage.ImageSizeY * Scale.Scale;
-
-                //double distanceX = Scale.Position.X * Scale.Scale;
-                //double distanceY = Scale.Position.Y * Scale.Scale;
-
-                ////Origin = new Point(Origin.X + (drawRect.Width - width) / 2 + distanceX, Origin.Y + (drawRect.Height - height) / 2 + distanceY);
-                //Origin = new Point(Origin.X + (drawRect.Width - width) / 2, Origin.Y + (drawRect.Height - height) / 2);
-
-                //drawRect.Width = width;
-                //drawRect.Height = height;
-
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(DeviceImage));
             }
         }
 
-        public Rectangle ViewRect
+        public DeviceImageStruct GetDeviceImage()
         {
-            get
+            return new DeviceImageStruct
             {
-                return new Rectangle
-                {
-                    X = 
-                }
-            }
+
+            };
         }
 
         public class DeviceImageStruct
@@ -82,16 +135,8 @@ namespace Controls
             public Rectangle DrawRect { get; set; }
         }
 
-        public DeviceImageStruct DeviceImage { get; set; }
         public Func<byte[], int, int, int, Task<object>> ImageCompaile;
-
-        //public class ImageStruct
-        //{
-        //    public byte[] Image { get; set; }
-        //    public int ImageSizeX { get; set; }
-        //    public int ImageSizeY { get; set; }
-        //}
-        //public ImageStruct DrawImage { get { return new DrawPanel.ImageStruct { Image = ImageData, ImageSizeX = ImageWidth, ImageSizeY = ImageHeight }; } }
+        public object DeviceImage { get; set; }
 
         public bool ImageDataValid { get { return ImagePixelOfByteSize > 0 && ImageData?.Length == ImageWidth * ImageHeight * ImagePixelOfByteSize; } }
         public byte[] ImageData

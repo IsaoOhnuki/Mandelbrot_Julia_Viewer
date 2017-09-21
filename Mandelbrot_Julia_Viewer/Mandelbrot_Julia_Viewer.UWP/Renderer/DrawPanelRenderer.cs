@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Input;
 using Windows.UI.Xaml.Controls;
 using System.Diagnostics;
+using static Controls.DrawPanel;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.UWP.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.UWP
@@ -107,8 +108,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
         private void Control_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
             //args.DrawingSession.FillRectangle(new Windows.Foundation.Rect(0, 0, Control.ActualWidth, Control.ActualHeight), Windows.UI.Color.FromArgb((byte)(Element.BackgroundColor.A * 255), (byte)(Element.BackgroundColor.R), (byte)(Element.BackgroundColor.G), (byte)(Element.BackgroundColor.B)));
-            if (Element.DeviceImage != null && Element.DeviceImage.Image != null)
-                args.DrawingSession.DrawImage((ICanvasImage)Element.DeviceImage.Image, new Windows.Foundation.Rect(0, 0, Control.ActualWidth, Control.ActualHeight), new Windows.Foundation.Rect(Element.DeviceImage.DrawRect.X, Element.DeviceImage.DrawRect.Y, Element.DeviceImage.DrawRect.Width, Element.DeviceImage.DrawRect.Height));
+            DeviceImageStruct deviceImage = Element.GetDeviceImage();
+            if (deviceImage != null && deviceImage.Image != null)
+                args.DrawingSession.DrawImage((ICanvasImage)deviceImage.Image, new Windows.Foundation.Rect(deviceImage.ViewRect.X, deviceImage.ViewRect.Y, deviceImage.ViewRect.Width, deviceImage.ViewRect.Height), new Windows.Foundation.Rect(deviceImage.DrawRect.X, deviceImage.DrawRect.Y, deviceImage.DrawRect.Width, deviceImage.DrawRect.Height));
         }
     }
 }
