@@ -12,6 +12,8 @@ using Xamarin.Forms.Platform.Android;
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.Droid.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.Droid
 {
+    // http://serenegiant.com/blog/?p=15 ImageViewを作ってみた〜その１〜準備編
+
     class DrawPanelRenderer : ViewRenderer<GradationDrawer, Android.Views.View>
     {
         protected override void OnElementChanged(ElementChangedEventArgs<GradationDrawer> e)
