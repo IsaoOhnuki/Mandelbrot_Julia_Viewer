@@ -92,5 +92,66 @@ namespace Controls
             4,
             propertyChanged: (bindable, oldValue, newValue) => {
             });
+
+        public struct Matrix2
+        {
+            double m11;
+            double m12;
+            double m13;
+            double m21;
+            double m22;
+            double m23;
+            double dx;
+            double dy;
+            double dd;
+            public static Matrix2 operator *(Matrix2 l, Matrix2 r)
+            {
+                return new Matrix2();
+            }
+            public Matrix2(double m11, double m12, double m21, double m22, double dx, double dy)
+            {
+                this.m11 = m11;
+                this.m12 = m12;
+                this.m13 = 0;
+                this.m21 = m21;
+                this.m22 = m22;
+                this.m23 = 0;
+                this.dx = dx;
+                this.dy = dy;
+                this.dd = 1;
+            }
+            public static Size Calc(Size point, Matrix2 matrix)
+            {
+                return new Size { Width = point.Width * matrix.m11 + point.Width * matrix.m12 + matrix.dx, Height = point.Height * matrix.m21 + point.Height * matrix.m22 + matrix.dy };
+            }
+            public static Point Calc(Point point, Matrix2 matrix)
+            {
+                return new Point { X = point.X * matrix.m11 + point.X * matrix.m12 + matrix.dx, Y = point.Y * matrix.m21 + point.Y * matrix.m22 + matrix.dy };
+            }
+            public static Point Enlargement(Point point, double x, double y)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = x, m12 = 0, m21 = 0, m22 = y, dx = 0, dy = 0 });
+            }
+            public static Point Move(Point point, double x, double y)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = 1, m12 = 0, m21 = 0, m22 = 1, dx = x, dy = y });
+            }
+            public static Point Rotate(Point point, double o)
+            {
+                return Matrix2.Calc(point, new Matrix2 { m11 = Math.Cos(o), m12 = -Math.Sin(o), m21 = Math.Sin(o), m22 = Math.Cos(o), dx = 0, dy = 0 });
+            }
+            public static Size Enlargement(Size size, double x, double y)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = x, m12 = 0, m21 = 0, m22 = y, dx = 0, dy = 0 });
+            }
+            public static Size Move(Size size, double x, double y)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = 1, m12 = 0, m21 = 0, m22 = 1, dx = x, dy = y });
+            }
+            public static Size Rotate(Size size, double o)
+            {
+                return Matrix2.Calc(size, new Matrix2 { m11 = Math.Cos(o), m12 = -Math.Sin(o), m21 = Math.Sin(o), m22 = Math.Cos(o), dx = 0, dy = 0 });
+            }
+        }
     }
 }
