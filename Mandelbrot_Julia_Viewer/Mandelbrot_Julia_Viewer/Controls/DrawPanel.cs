@@ -16,9 +16,27 @@ namespace Controls
             public byte[] Image { get; set; }
             public int ImageSizeX { get; set; }
             public int ImageSizeY { get; set; }
+            public int PixelSize { get; set; }
+            public Rectangle DrawRect { get; set; }
+        }
+
+        public bool GetDrawImmage(Rectangle drawRect, out DrawImageStruct drawImage)
+        {
+            if (ImageDataValid)
+            {
+                drawImage = new DrawImageStruct();
+                return true;
+            }
+            else
+            {
+                drawImage = null;
+                return false;
+            }
         }
 
         public DrawImageStruct DrawImage { get { return new DrawPanel.DrawImageStruct { Image = ImageData, ImageSizeX = ImageWidth, ImageSizeY = ImageHeight }; } }
+
+        public Func<byte[], int, int, int, Task<object>> ImageCompaile;
 
         public bool ImageDataValid { get { return ImagePixelOfByteSize > 0 && ImageData?.Length == ImageWidth * ImageHeight * ImagePixelOfByteSize; } }
 
