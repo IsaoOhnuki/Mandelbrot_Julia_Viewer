@@ -13,32 +13,49 @@ namespace Controls
 
         public class DrawImageStruct
         {
-            public byte[] Image { get; set; }
-            public int ImageSizeX { get; set; }
-            public int ImageSizeY { get; set; }
-            public int PixelSize { get; set; }
+            public object Image { get; set; }
+            public Rectangle ViewRect { get; set; }
             public Rectangle DrawRect { get; set; }
         }
 
-        public bool GetDrawImmage(Rectangle drawRect, out DrawImageStruct drawImage)
+        public Task<DrawImageStruct> DrawImmageRequestAsync(Point reqPoint, Size reqSize)
         {
-            if (ImageDataValid)
-            {
-                drawImage = new DrawImageStruct();
-                return true;
-            }
-            else
-            {
-                drawImage = null;
-                return false;
-            }
+            return Task.Run(() => {
+                Rectangle imgRect = new Rectangle(reqPoint, reqSize);
+                //Rectangle drawRect = imgRect.Intersect(ImageRect);
+                Rectangle drawRect = Rectangle.Intersect(imgRect, ImageRect);
+
+                return new DrawImageStruct
+                {
+                    Image = deviceImage,
+                    ViewRect = drawRect,
+                    DrawRect = drawRect
+                };
+            });
         }
 
-        public DrawImageStruct DrawImage { get { return new DrawPanel.DrawImageStruct { Image = ImageData, ImageSizeX = ImageWidth, ImageSizeY = ImageHeight }; } }
+        public Func<byte[], int, int, int, Task<object>> ImageCompile;
 
-        public Func<byte[], int, int, int, Task<object>> ImageCompaile;
+        private object deviceImage;
+        public object DeviceImage
+        {
+            get { return deviceImage; }
+            set
+            {
+                deviceImage = value;
+                OnPropertyChanged();
+            }
+        }
+        public async void DeviceImageCompile()
+        {
+            DeviceImage = await ImageCompile?.Invoke(ImageData, ImageWidth, ImageHeight, ImagePixelOfByteSize);
+        }
 
         public bool ImageDataValid { get { return ImagePixelOfByteSize > 0 && ImageData?.Length == ImageWidth * ImageHeight * ImagePixelOfByteSize; } }
+
+        public Rectangle ImageRect { get { return new Rectangle(0, 0, ImageWidth, ImageHeight); } }
+        public Size ImageSize { get { return new Size(ImageWidth, ImageHeight); } }
+        public Point ImageOrigin { get { return new Point(ImageWidth / 2, ImageHeight / 2); } }
 
         public byte[] ImageData
         {
@@ -55,7 +72,7 @@ namespace Controls
                 DrawPanel obj = bindable as DrawPanel;
                 if (obj != null && obj.ImageDataValid)
                 {
-                    obj.OnPropertyChanged(nameof(DrawImage));
+                    obj.DeviceImageCompile();
                 }
             });
 
@@ -74,7 +91,7 @@ namespace Controls
                 DrawPanel obj = bindable as DrawPanel;
                 if (obj != null && obj.ImageDataValid)
                 {
-                    obj.OnPropertyChanged(nameof(DrawImage));
+                    obj.DeviceImageCompile();
                 }
             });
 
@@ -93,7 +110,7 @@ namespace Controls
                 DrawPanel obj = bindable as DrawPanel;
                 if (obj != null && obj.ImageDataValid)
                 {
-                    obj.OnPropertyChanged(nameof(DrawImage));
+                    obj.DeviceImageCompile();
                 }
             });
 
@@ -107,8 +124,13 @@ namespace Controls
             nameof(ImagePixelOfByteSize),
             typeof(int),
             typeof(DrawPanel),
-            4,
+            defaultValue: 4,
             propertyChanged: (bindable, oldValue, newValue) => {
+                DrawPanel obj = bindable as DrawPanel;
+                if (obj != null && obj.ImageDataValid)
+                {
+                    obj.DeviceImageCompile();
+                }
             });
 
         public struct Matrix2
