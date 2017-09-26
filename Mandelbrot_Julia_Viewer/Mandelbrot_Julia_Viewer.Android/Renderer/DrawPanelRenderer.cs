@@ -10,6 +10,9 @@ using Android.Views;
 using Xamarin.Forms.Platform.Android;
 using static Controls.DrawPanel;
 using Android.Graphics;
+using static Android.Views.ScaleGestureDetector;
+using static Android.Views.GestureDetector;
+using Models;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.Droid.DrawPanelRenderer))]
 namespace Mandelbrot_Julia_Viewer.Droid
@@ -17,11 +20,15 @@ namespace Mandelbrot_Julia_Viewer.Droid
     // http://serenegiant.com/blog/?p=15 ImageViewを作ってみた〜その１〜準備編
     // http://qiita.com/AyaseSH/items/52768d4a9f22f417642f Xamarin.FormsでPinchGestureRecognizerのユーザー操作について
     // http://ticktack.hatenablog.jp/entry/2016/06/11/124751 【Xamarin.Forms】ViewRendererと仲良くなるための簡易チュートリアル
-    // http://seesaawiki.jp/w/moonlight_aska/d/%CA%A3%BB%A8%A4%CA%A5%BF%A5%C3%A5%C1%A5%A4%A5%D9%A5%F3%A5%C8%A4%F2%BC%E8%C6%C0%A4%B9%A4%EB 複雑なタッチイベントを取得する
+    // http://seesaawiki.jp/w/moonlight_aska/d/%ca%a3%bb%a8%a4%ca%a5%bf%a5%c3%a5%c1%a5%a4%a5%d9%a5%f3%a5%c8%a4%f2%bc%e8%c6%c0%a4%b9%a4%eb 複雑なタッチイベントを取得する
     // http://qiita.com/bassyaroo/items/ed13b2da3b289faa0d89 Android ピンチイン　ピンチアウト　ロングプレス　併用する
+    // http://zawapro.com/?p=1474 【Android】GestuerDetectorとScrollerを組み合わせた例
 
-    class DrawPanelRenderer : ViewRenderer<DrawPanel, Android.Views.View>
+    class DrawPanelRenderer : ViewRenderer<DrawPanel, Android.Views.View>, IOnScaleGestureListener, IOnGestureListener
     {
+        public ScaleGestureDetector ScaleGestureDetector { get; set; }
+        public GestureDetector GestureDetector { get; set; }
+
         public Xamarin.Forms.Point ViewPoint { get; set; }
         public Size ViewSize { get { return new Size(Control.Width, Control.Height); } }
         public Xamarin.Forms.Point ViewOrigin { get { return new Xamarin.Forms.Point(Control.Width / 2, Control.Height / 2); } }
@@ -44,36 +51,35 @@ namespace Mandelbrot_Julia_Viewer.Droid
             if (Control == null && e.NewElement != null)
             {
                 var ctrl = new Android.Views.View(this.Context);
-                //ctrl.ManipulationMode = Windows.UI.Xaml.Input.ManipulationModes.All;
+
+                ScaleGestureDetector = new ScaleGestureDetector(this.Context, this);
+                GestureDetector = new GestureDetector(this.Context, this);
+
                 SetNativeControl(ctrl);
             }
             if (Control != null && e.OldElement != null)
             {
-                //Control.Draw -= Control_Draw;
-                //Control.SizeChanged -= Control_SizeChanged;
-                //Control.ManipulationDelta -= Control_ManipulationDelta;
-                //Control.PointerWheelChanged -= Control_PointerWheelChanged;
+                Control.Touch -= Control_Touch;
+                Control.LayoutChange -= Control_LayoutChange;
 
                 Element.ImageCompile -= ImageCompile;
             }
             if (Control != null && e.NewElement != null)
             {
-                //Control.Draw += Control_Draw;
-                //Control.SizeChanged += Control_SizeChanged;
-                //Control.ManipulationDelta += Control_ManipulationDelta;
-                //Control.PointerWheelChanged += Control_PointerWheelChanged;
+                Control.Touch += Control_Touch;
+                Control.LayoutChange += Control_LayoutChange;
 
                 Element.ImageCompile += ImageCompile;
             }
             base.OnElementChanged(e);
         }
 
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
             if (e.PropertyName == "DeviceImage")
             {
-                //DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+                DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
 
                 Control.Invalidate();
             }
@@ -81,20 +87,72 @@ namespace Mandelbrot_Julia_Viewer.Droid
 
         Task<object> ImageCompile(byte[] image, int x, int y, int p)
         {
-            return Task.Run(() => {
-                return (object)null;
-                //return (object)Android.Graphics.BitmapFactory.DecodeByteArray(image, x, y, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96);
+            return Task.Run(async() => {
+                byte[] bmpData = await BitmapCreator.Create((short)x, (short)y, image, false);
+                return (object)BitmapFactory.DecodeByteArray(bmpData, 0, bmpData.Length);
             });
         }
 
-        //private async void Control_SizeChanged(object sender, Windows.UI.Xaml.SizeChangedEventArgs e)
-        //{
-        //    //Debug.WriteLine("Control_SizeChanged");
+        private void Control_LayoutChange(object sender, LayoutChangeEventArgs e)
+        {
+            //{
+            //    //Debug.WriteLine("Control_SizeChanged");
 
-        //    DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            //    DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
 
-        //    Control.Invalidate();
-        //}
+            //    Control.Invalidate();
+        }
+
+        private void Control_Touch(object sender, TouchEventArgs e)
+        {
+            ScaleGestureDetector.OnTouchEvent(e.Event);
+            GestureDetector.OnTouchEvent(e.Event);
+        }
+
+        public bool OnScale(ScaleGestureDetector detector)
+        {
+            return true;
+        }
+
+        public bool OnScaleBegin(ScaleGestureDetector detector)
+        {
+            return true;
+        }
+
+        public void OnScaleEnd(ScaleGestureDetector detector)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public bool OnDown(MotionEvent e)
+        {
+            return true;
+        }
+
+        public bool OnFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+        {
+            return true;
+        }
+
+        public void OnLongPress(MotionEvent e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public bool OnScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+        {
+            return true;
+        }
+
+        public void OnShowPress(MotionEvent e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public bool OnSingleTapUp(MotionEvent e)
+        {
+            return true;
+        }
 
         //private async void Control_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         //{
@@ -145,6 +203,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
             Paint paint = new Paint(PaintFlags.AntiAlias);
 
             paint.Color = new Android.Graphics.Color((byte)(Element.BackgroundColor.A * 255d), (byte)(Element.BackgroundColor.R * 255d), (byte)(Element.BackgroundColor.G * 255d), (byte)(Element.BackgroundColor.B * 255d));
+            //paint.Color = Android.Graphics.Color.Honeydew;
             paint.SetStyle(Paint.Style.Fill);
             canvas.DrawRect(new Rect(0, 0, Width, Height), paint);
 
@@ -160,7 +219,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
                     Size = Matrix2.Enlargement(DrawImage.DrawRect.Size, Scale, Scale)
                 };
 
-                //args.DrawingSession.DrawImage(DrawImage.Image as ICanvasImage, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect));
+                canvas.DrawBitmap((Bitmap)DrawImage.Image, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect), null);
             }
         }
 

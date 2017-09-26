@@ -117,11 +117,6 @@ namespace Mandelbrot_Julia_Viewer.UWP
                     Scale = Scale / (0.2 * -delta / 120 + 1);
                 }
 
-                Point oldPoint = ViewPoint;
-                Point newPoint = new Point(-(pointer.ContactRect.X - ViewPoint.X), -(pointer.ContactRect.Y - ViewPoint.Y));
-                ViewPoint = Matrix2.Enlargement(newPoint, Scale, Scale);
-                ViewPoint = ViewPoint.Offset(pointer.ContactRect.X / Scale, pointer.ContactRect.Y / Scale);
-
                 DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
 
                 Control.Invalidate();
@@ -131,8 +126,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
         private async void Control_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
         {
             //Debug.WriteLine("Control_ManipulationDelta");
-            ViewPoint = ViewPoint.Offset(-e.Delta.Translation.X / Scale, -e.Delta.Translation.Y / Scale);
 
+            ViewPoint = ViewPoint.Offset(-e.Delta.Translation.X / Scale, -e.Delta.Translation.Y / Scale);
+            
             DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
 
             Control.Invalidate();
