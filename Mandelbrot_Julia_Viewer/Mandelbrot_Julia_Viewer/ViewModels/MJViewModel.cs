@@ -61,7 +61,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             get { return colorParette; }
             set
             {
-                //colorParette = value;
                 colorParette = null;
                 if (value != null)
                 {
@@ -182,7 +181,12 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             get { return image; }
             set
             {
-                image = value;
+                image = null;
+                if (value != null)
+                {
+                    image = new byte[value.GetLength(0)];
+                    value.CopyTo(image, 0);
+                }
                 OnPropertyChanged();
             }
         }
@@ -293,7 +297,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 else if (UndoList.Last.ColorResolution != mji.ColorResolution)
                 {
                     mji.MJ.Data = UndoList.Last.MJ.Data;
-                    //byte[] Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     Image = mji.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
@@ -315,7 +318,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 if (!UndoList.HasLast || UndoList.Last.MJ != mji.MJ)
                 {
                     mji.MJ.Data = await Mandelbrot_Julia.JuliaMap(mji.MJ.XPos, mji.MJ.YPos, mji.MJ.Radius, mji.MJ.Repert, mji.MJ.Resolution, mji.MJ.JuliaMapSplit);
-                    //byte[] Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     Image = mji.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
@@ -324,7 +326,6 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 else if (UndoList.Last.ColorResolution != mji.ColorResolution)
                 {
                     mji.MJ.Data = UndoList.Last.MJ.Data;
-                    //byte[] Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     Image = mji.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
                     UndoList.Push(mji);
                     OnPropertyChanged(nameof(CanUndo));
@@ -334,7 +335,7 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 {
                     Image = mji.Image;
                 }
-                FractalType = "JuliaSet";
+                FractalType = "JuliaMup";
             });
         }
     }

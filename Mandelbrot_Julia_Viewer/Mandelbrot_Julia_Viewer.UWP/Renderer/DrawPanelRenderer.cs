@@ -60,6 +60,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 Control.ManipulationDelta -= Control_ManipulationDelta;
                 Control.PointerWheelChanged -= Control_PointerWheelChanged;
 
+                Control.Tapped -= Control_Tapped;
+                Control.DoubleTapped -= Control_DoubleTapped;
+
                 Element.ImageCompile -= ImageCompile;
             }
             if (Control != null && e.NewElement != null)
@@ -69,9 +72,24 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 Control.ManipulationDelta += Control_ManipulationDelta;
                 Control.PointerWheelChanged += Control_PointerWheelChanged;
 
+                Control.Tapped += Control_Tapped;
+                Control.DoubleTapped += Control_DoubleTapped;
+
                 Element.ImageCompile += ImageCompile;
             }
             base.OnElementChanged(e);
+        }
+
+        private void Control_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            var pos = e.GetPosition((UIElement)sender);
+            Element.OnDoubleTapped(pos.X, pos.Y);
+        }
+
+        private void Control_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var pos = e.GetPosition((UIElement)sender);
+            Element.OnTapped(pos.X, pos.Y);
         }
 
         protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)

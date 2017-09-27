@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace Controls
@@ -54,6 +55,10 @@ namespace Controls
             get { return deviceImage; }
             set
             {
+                if (deviceImage is IDisposable)
+                {
+                    (deviceImage as IDisposable).Dispose();
+                }
                 deviceImage = value;
                 OnPropertyChanged();
             }
@@ -144,6 +149,66 @@ namespace Controls
                     obj.DeviceImageCompile();
                 }
             });
+
+        public ICommand TappedCommand
+        {
+            get { return (ICommand)GetValue(TappedCommandProperty); }
+            set { SetValue(TappedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty TappedCommandProperty = BindableProperty.Create(
+            nameof(TappedCommand),
+            typeof(ICommand),
+            typeof(DrawPanel),
+            default(ICommand),
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
+
+        public void OnTapped(double x, double y)
+        {
+            if (TappedCommand != null && TappedCommand.CanExecute(null))
+                TappedCommand?.Execute(new Point(x, y));
+        }
+
+        public ICommand DoubleTappedCommand
+        {
+            get { return (ICommand)GetValue(DoubleTappedCommandProperty); }
+            set { SetValue(DoubleTappedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty DoubleTappedCommandProperty = BindableProperty.Create(
+            nameof(DoubleTappedCommand),
+            typeof(ICommand),
+            typeof(DrawPanel),
+            default(ICommand),
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
+
+        public void OnDoubleTapped(double x, double y)
+        {
+            if (DoubleTappedCommand != null && DoubleTappedCommand.CanExecute(null))
+                DoubleTappedCommand?.Execute(new Point(x, y));
+        }
+
+        public ICommand LongTappedCommand
+        {
+            get { return (ICommand)GetValue(LongTappedCommandProperty); }
+            set { SetValue(LongTappedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty LongTappedCommandProperty = BindableProperty.Create(
+            nameof(LongTappedCommand),
+            typeof(ICommand),
+            typeof(DrawPanel),
+            default(ICommand),
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
+
+        public void OnLongTapped(double x, double y)
+        {
+            if (LongTappedCommand != null && LongTappedCommand.CanExecute(null))
+                LongTappedCommand?.Execute(new Point(x, y));
+        }
 
         public struct Matrix2
         {
