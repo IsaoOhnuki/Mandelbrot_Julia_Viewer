@@ -107,6 +107,7 @@ namespace Mandelbrot_Julia_Viewer.UWP
             var pointer = e.GetCurrentPoint(Control).Properties;
             if (!pointer.IsLeftButtonPressed && !pointer.IsRightButtonPressed)
             {
+                double oldScale = Scale;
                 int delta = pointer.MouseWheelDelta;
                 if (delta > 0)
                 {
@@ -116,6 +117,10 @@ namespace Mandelbrot_Julia_Viewer.UWP
                 {
                     Scale = Scale / (0.2 * -delta / 120 + 1);
                 }
+
+                Point oldPoint = ViewPoint.Offset(pointer.ContactRect.X / oldScale, pointer.ContactRect.Y / oldScale);
+                Point newPoint = ViewPoint.Offset(pointer.ContactRect.X / Scale, pointer.ContactRect.Y / Scale);
+                ViewPoint = ViewPoint.Offset(oldPoint.X - newPoint.X, oldPoint.Y - newPoint.Y);
 
                 DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
 
@@ -140,9 +145,6 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
             if (DrawImage != null && DrawImage.Image != null)
             {
-                Rectangle reqRect = new Rectangle(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
-
-                //Rectangle viewRect = DrawImage.DrawRect.Offset(-ViewPoint.X, -ViewPoint.Y);
                 Rectangle viewRect = new Rectangle
                 {
                     Location = Matrix2.Enlargement(DrawImage.DrawRect.Location.Offset(-ViewPoint.X, -ViewPoint.Y), Scale, Scale),

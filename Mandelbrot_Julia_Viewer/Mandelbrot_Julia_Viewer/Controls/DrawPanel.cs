@@ -22,7 +22,6 @@ namespace Controls
         {
             return Task.Run(() => {
                 Rectangle imgRect = new Rectangle(reqPoint, reqSize);
-                //Rectangle drawRect = imgRect.Intersect(ImageRect);
                 Rectangle drawRect = Rectangle.Intersect(imgRect, ImageRect);
 
                 return new DrawImageStruct
@@ -32,6 +31,19 @@ namespace Controls
                     DrawRect = drawRect
                 };
             });
+        }
+
+        public DrawImageStruct DrawImmageRequest(Point reqPoint, Size reqSize)
+        {
+            Rectangle imgRect = new Rectangle(reqPoint, reqSize);
+            Rectangle drawRect = Rectangle.Intersect(imgRect, ImageRect);
+
+            return new DrawImageStruct
+            {
+                Image = deviceImage,
+                ViewRect = drawRect,
+                DrawRect = drawRect
+            };
         }
 
         public Func<byte[], int, int, int, Task<object>> ImageCompile;
