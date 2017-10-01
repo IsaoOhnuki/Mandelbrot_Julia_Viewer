@@ -6,6 +6,8 @@
              x:Class="Mandelbrot_Julia_Viewer.Views.DrawPage">
     <ContentPage.Content>
         <!-- https://forums.xamarin.com/discussion/17767/touch-coordinates-in-tapgesturerecognizer TapGestureRecognizerで座標をタッチしますか？ -->
-        <Controls:DrawPanel x:Name="ImageControl" BackgroundColor="LightSalmon" WidthRequest="{Binding Resolution}" HeightRequest="{Binding Resolution}" ImageData="{Binding Image}" ImageWidth="{Binding Resolution}" ImageHeight="{Binding Resolution}"/>
+        <Controls:DrawPanel x:Name="ImageControl" BackgroundColor="LightSalmon" WidthRequest="{Binding Resolution}" HeightRequest="{Binding Resolution}"
+                            ImageData="{Binding Image}" ImageWidth="{Binding Resolution}" ImageHeight="{Binding Resolution}" ViewScale="{Binding ViewScale}"
+                            DoubleTappedCommand="{Binding DoubleTappedCommand}"/>
     </ContentPage.Content>
 </ContentPage>

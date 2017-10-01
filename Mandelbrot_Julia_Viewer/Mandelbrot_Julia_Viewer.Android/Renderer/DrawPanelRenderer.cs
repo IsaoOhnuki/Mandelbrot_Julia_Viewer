@@ -16,6 +16,8 @@ using Models;
 using Android.Widget;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.Droid.DrawPanelRenderer))]
+[assembly: Dependency(typeof(Mandelbrot_Julia_Viewer.Droid.DeviceBitmapCreator))]
+
 namespace Mandelbrot_Julia_Viewer.Droid
 {
     // http://serenegiant.com/blog/?p=15 ImageViewを作ってみた〜その１〜準備編
@@ -25,27 +27,17 @@ namespace Mandelbrot_Julia_Viewer.Droid
     // http://qiita.com/bassyaroo/items/ed13b2da3b289faa0d89 Android ピンチイン　ピンチアウト　ロングプレス　併用する
     // http://zawapro.com/?p=1474 【Android】GestuerDetectorとScrollerを組み合わせた例
     // https://qiita.com/shinido/items/65399846a5e9eba1aa5e GestureDetectorのまとめ
+    // http://dixq.net/Android/02_04.html ジェスチャイベントを取得する
 
     class DrawPanelRenderer : ViewRenderer<DrawPanel, Android.Views.View>, IOnScaleGestureListener, IOnGestureListener
     {
         public ScaleGestureDetector ScaleGestureDetector { get; set; }
         public GestureDetector GestureDetector { get; set; }
-        public Scroller Scroller { get; set; }
+        //public Scroller Scroller { get; set; }
+        public OverScroller Scroller { get; set; }
 
-        public Xamarin.Forms.Point ViewPoint { get; set; }
         public Size ViewSize { get { return new Size(Control.Width, Control.Height); } }
         public Xamarin.Forms.Point ViewOrigin { get { return new Xamarin.Forms.Point(Control.Width / 2, Control.Height / 2); } }
-        private double scale = 1;
-        public double Scale
-        {
-            get { return scale; }
-            set
-            {
-                scale = value;
-                if (scale < 0.001)
-                    scale = 0.001;
-            }
-        }
 
         public DrawImageStruct DrawImage { get; set; }
 
@@ -58,7 +50,7 @@ namespace Mandelbrot_Julia_Viewer.Droid
                 ScaleGestureDetector = new ScaleGestureDetector(this.Context, this);
                 GestureDetector = new GestureDetector(this.Context, this);
                 GestureDetector.IsLongpressEnabled = false;
-                Scroller = new Scroller(this.Context);
+                Scroller = new OverScroller(this.Context);
 
                 SetNativeControl(ctrl);
             }
@@ -66,15 +58,11 @@ namespace Mandelbrot_Julia_Viewer.Droid
             {
                 Control.Touch -= Control_Touch;
                 Control.LayoutChange -= Control_LayoutChange;
-
-                Element.ImageCompile -= ImageCompile;
             }
             if (Control != null && e.NewElement != null)
             {
                 Control.Touch += Control_Touch;
                 Control.LayoutChange += Control_LayoutChange;
-
-                Element.ImageCompile += ImageCompile;
             }
             base.OnElementChanged(e);
         }
@@ -84,25 +72,17 @@ namespace Mandelbrot_Julia_Viewer.Droid
             base.OnElementPropertyChanged(sender, e);
             if (e.PropertyName == "DeviceImage")
             {
-                DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+                DrawImage = await Element.DrawImmageRequestAsync(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
                 Invalidate();
             }
-        }
-
-        Task<object> ImageCompile(byte[] image, int x, int y, int p)
-        {
-            return Task.Run(async() => {
-                byte[] bmpData = await BitmapCreator.Create((short)x, (short)y, image, false);
-                return (object)BitmapFactory.DecodeByteArray(bmpData, 0, bmpData.Length);
-            });
         }
 
         private void Control_LayoutChange(object sender, LayoutChangeEventArgs e)
         {
             //Debug.WriteLine("Control_SizeChanged");
 
-            DrawImage = Element.DrawImmageRequest(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            DrawImage = Element.DrawImmageRequest(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
             Invalidate();
         }
@@ -121,22 +101,23 @@ namespace Mandelbrot_Julia_Viewer.Droid
 
             if (detector.PreviousSpan != detector.CurrentSpan)
             {
-                double oldScale = Scale;
+                double oldScale = Element.ViewScale;
+                // UWP delta とは逆値
                 double sclae = detector.PreviousSpan / detector.CurrentSpan;
-                if (sclae > 1)
+                if (sclae < 1)
                 {
-                    Scale = Scale * (sclae * 1.2);
+                    Element.ViewScale = Element.ViewScale * (sclae * 1.1);
                 }
-                else if (sclae < 1)
+                else if (sclae > 1)
                 {
-                    Scale = Scale * (sclae / 1.2);
+                    Element.ViewScale = Element.ViewScale * (sclae / 1.1);
                 }
 
-                Xamarin.Forms.Point oldPoint = ViewPoint.Offset(detector.FocusX / oldScale, detector.FocusY / oldScale);
-                Xamarin.Forms.Point newPoint = ViewPoint.Offset(detector.FocusX / Scale, detector.FocusY / Scale);
-                ViewPoint = ViewPoint.Offset(oldPoint.X - newPoint.X, oldPoint.Y - newPoint.Y);
+                Xamarin.Forms.Point oldPoint = Element.ViewPoint.Offset(detector.FocusX / oldScale, detector.FocusY / oldScale);
+                Xamarin.Forms.Point newPoint = Element.ViewPoint.Offset(detector.FocusX / Element.ViewScale, detector.FocusY / Element.ViewScale);
+                Element.ViewPoint = Element.ViewPoint.Offset(oldPoint.X - newPoint.X, oldPoint.Y - newPoint.Y);
 
-                DrawImage = Element.DrawImmageRequest(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+                DrawImage = Element.DrawImmageRequest(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
                 Invalidate();
             }
@@ -160,12 +141,27 @@ namespace Mandelbrot_Julia_Viewer.Droid
 
         public bool OnFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
         {
-            Scroller.Fling((int)e2.GetX(), (int)e2.GetY(), (int)velocityX, (int)velocityY, 0, Width, 0, Height);
-            //ViewPoint = ViewPoint.Offset(-velocityX / Scale, -velocityY / Scale);
+            var x = e2.GetX();
+            var y = e2.GetY();
 
-            //DrawImage = Element.DrawImmageRequest(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            Scroller.Fling((int)x, (int)y, (int)velocityX / 4, (int)velocityY / 4, 0, Width * 5, 0, Height * 5);
 
-            //Invalidate();
+            Device.StartTimer(new TimeSpan(1), () => {
+                if (Scroller.ComputeScrollOffset())
+                {
+                    var xx = Scroller.CurrX;
+                    var yy = Scroller.CurrY;
+
+                    Element.ViewPoint = Element.ViewPoint.Offset(-(xx - x) / Element.ViewScale, -(yy - y) / Element.ViewScale);
+
+                    DrawImage = Element.DrawImmageRequest(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
+
+                    Invalidate();
+                }
+                return !Scroller.IsFinished;
+            });
+
+
             return true;
         }
 
@@ -178,9 +174,10 @@ namespace Mandelbrot_Julia_Viewer.Droid
         {
             //Debug.WriteLine("Control_ManipulationDelta");
 
-            ViewPoint = ViewPoint.Offset(-distanceX, -distanceY);
+            // UWP delta とは逆値
+            Element.ViewPoint = Element.ViewPoint.Offset(distanceX / Element.ViewScale, distanceY / Element.ViewScale);
 
-            DrawImage = Element.DrawImmageRequest(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            DrawImage = Element.DrawImmageRequest(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
             Invalidate();
             return true;
@@ -212,11 +209,12 @@ namespace Mandelbrot_Julia_Viewer.Droid
             {
                 Rectangle viewRect = new Rectangle
                 {
-                    Location = Matrix2.Enlargement(DrawImage.DrawRect.Location.Offset(-ViewPoint.X, -ViewPoint.Y), Scale, Scale),
-                    Size = Matrix2.Enlargement(DrawImage.DrawRect.Size, Scale, Scale)
+                    Location = Matrix2.Enlargement(DrawImage.DrawRect.Location.Offset(-Element.ViewPoint.X, -Element.ViewPoint.Y), Element.ViewScale, Element.ViewScale),
+                    Size = Matrix2.Enlargement(DrawImage.DrawRect.Size, Element.ViewScale, Element.ViewScale)
                 };
 
-                canvas.DrawBitmap((Bitmap)DrawImage.Image, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect), null);
+                canvas.DrawBitmap(DrawImage.Image as Bitmap, GetDeviceRect(DrawImage.DrawRect), GetDeviceRect(viewRect), null);
+                //canvas.DrawBitmap(DrawImage.Image as Bitmap, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect), null);
             }
         }
 
@@ -226,4 +224,14 @@ namespace Mandelbrot_Julia_Viewer.Droid
         }
     }
 
+    public class DeviceBitmapCreator : IDeviceBitmapCreator
+    {
+        public Task<object> Create(byte[] imageData, int imageWidth, int imageHeight, int pixelByteCount)
+        {
+            return Task.Run(async() => {
+                byte[] bmpData = await BitmapCreator.Create((short)imageWidth, (short)imageHeight, imageData, false);
+                return (object)BitmapFactory.DecodeByteArray(bmpData, 0, bmpData.Length);
+            });
+        }
+    }
 }

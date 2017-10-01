@@ -22,26 +22,17 @@ using System.Diagnostics;
 using static Controls.DrawPanel;
 
 [assembly: ExportRenderer(typeof(DrawPanel), typeof(Mandelbrot_Julia_Viewer.UWP.DrawPanelRenderer))]
+[assembly: Dependency (typeof(Mandelbrot_Julia_Viewer.UWP.DeviceBitmapCreator))]
+
 namespace Mandelbrot_Julia_Viewer.UWP
 {
+    // http://www.buildinsider.net/mobile/xamarintips/0008 Xamarin.Formsからプラットフォーム固有の機能を利用するには？（DependencyService利用）
     // https://github.com/Microsoft/Windows-universal-samples/tree/master/Samples/BasicInput Basic input sample
 
     class DrawPanelRenderer : ViewRenderer<DrawPanel, CanvasControl>
     {
-        public Point ViewPoint { get; set; }
         public Size ViewSize { get { return new Size(Control.ActualWidth, Control.ActualHeight); } }
         public Point ViewOrigin { get { return new Point(Control.ActualWidth / 2, Control.ActualHeight / 2); } }
-        private double scale = 1;
-        public double Scale
-        {
-            get { return scale; }
-            set
-            {
-                scale = value;
-                if (scale < 0.001)
-                    scale = 0.001;
-            }
-        }
 
         public DrawImageStruct DrawImage { get; set; }
 
@@ -62,8 +53,8 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
                 Control.Tapped -= Control_Tapped;
                 Control.DoubleTapped -= Control_DoubleTapped;
-
-                Element.ImageCompile -= ImageCompile;
+                Control.Holding -= Control_Holding;
+                Control.RightTapped -= Control_RightTapped;
             }
             if (Control != null && e.NewElement != null)
             {
@@ -74,22 +65,34 @@ namespace Mandelbrot_Julia_Viewer.UWP
 
                 Control.Tapped += Control_Tapped;
                 Control.DoubleTapped += Control_DoubleTapped;
-
-                Element.ImageCompile += ImageCompile;
+                Control.Holding += Control_Holding;
+                Control.RightTapped += Control_RightTapped;
             }
             base.OnElementChanged(e);
+        }
+
+        private void Control_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            var pos = e.GetPosition((UIElement)sender);
+            Element.OnLongTapped(pos.X / Element.ViewScale + Element.ViewPoint.X, pos.Y / Element.ViewScale + Element.ViewPoint.Y);
+        }
+
+        private void Control_Holding(object sender, HoldingRoutedEventArgs e)
+        {
+            var pos = e.GetPosition((UIElement)sender);
+            Element.OnLongTapped(pos.X / Element.ViewScale + Element.ViewPoint.X, pos.Y / Element.ViewScale + Element.ViewPoint.Y);
         }
 
         private void Control_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             var pos = e.GetPosition((UIElement)sender);
-            Element.OnDoubleTapped(pos.X, pos.Y);
+            Element.OnDoubleTapped(pos.X / Element.ViewScale + Element.ViewPoint.X, pos.Y / Element.ViewScale + Element.ViewPoint.Y);
         }
 
         private void Control_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var pos = e.GetPosition((UIElement)sender);
-            Element.OnTapped(pos.X, pos.Y);
+            Element.OnTapped(pos.X / Element.ViewScale + Element.ViewPoint.X, pos.Y / Element.ViewScale + Element.ViewPoint.Y);
         }
 
         protected override async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -97,24 +100,17 @@ namespace Mandelbrot_Julia_Viewer.UWP
             base.OnElementPropertyChanged(sender, e);
             if (e.PropertyName == "DeviceImage")
             {
-                DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+                DrawImage = await Element.DrawImmageRequestAsync(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
                 Control.Invalidate();
             }
-        }
-
-        Task<object> ImageCompile(byte[] image, int x, int y, int p)
-        {
-            return Task.Run(() => {
-                return (object)CanvasBitmap.CreateFromBytes(CanvasDevice.GetSharedDevice(), image, x, y, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96);
-            });
         }
 
         private async void Control_SizeChanged(object sender, Windows.UI.Xaml.SizeChangedEventArgs e)
         {
             //Debug.WriteLine("Control_SizeChanged");
 
-            DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            DrawImage = await Element.DrawImmageRequestAsync(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
             Control.Invalidate();
         }
@@ -125,22 +121,22 @@ namespace Mandelbrot_Julia_Viewer.UWP
             var pointer = e.GetCurrentPoint(Control).Properties;
             if (!pointer.IsLeftButtonPressed && !pointer.IsRightButtonPressed)
             {
-                double oldScale = Scale;
+                double oldScale = Element.ViewScale;
                 int delta = pointer.MouseWheelDelta;
                 if (delta > 0)
                 {
-                    Scale = Scale * (0.2 * delta / 120 + 1);
+                    Element.ViewScale = Element.ViewScale * (0.2 * delta / 120 + 1);
                 }
                 else if (delta < 0)
                 {
-                    Scale = Scale / (0.2 * -delta / 120 + 1);
+                    Element.ViewScale = Element.ViewScale / (0.2 * -delta / 120 + 1);
                 }
 
-                Point oldPoint = ViewPoint.Offset(pointer.ContactRect.X / oldScale, pointer.ContactRect.Y / oldScale);
-                Point newPoint = ViewPoint.Offset(pointer.ContactRect.X / Scale, pointer.ContactRect.Y / Scale);
-                ViewPoint = ViewPoint.Offset(oldPoint.X - newPoint.X, oldPoint.Y - newPoint.Y);
+                Point oldPoint = Element.ViewPoint.Offset(pointer.ContactRect.X / oldScale, pointer.ContactRect.Y / oldScale);
+                Point newPoint = Element.ViewPoint.Offset(pointer.ContactRect.X / Element.ViewScale, pointer.ContactRect.Y / Element.ViewScale);
+                Element.ViewPoint = Element.ViewPoint.Offset(oldPoint.X - newPoint.X, oldPoint.Y - newPoint.Y);
 
-                DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+                DrawImage = await Element.DrawImmageRequestAsync(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
                 Control.Invalidate();
             }
@@ -150,9 +146,9 @@ namespace Mandelbrot_Julia_Viewer.UWP
         {
             //Debug.WriteLine("Control_ManipulationDelta");
 
-            ViewPoint = ViewPoint.Offset(-e.Delta.Translation.X / Scale, -e.Delta.Translation.Y / Scale);
+            Element.ViewPoint = Element.ViewPoint.Offset(-e.Delta.Translation.X / Element.ViewScale, -e.Delta.Translation.Y / Element.ViewScale);
             
-            DrawImage = await Element.DrawImmageRequestAsync(ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Scale, 1 / Scale));
+            DrawImage = await Element.DrawImmageRequestAsync(Element.ViewPoint, Matrix2.Enlargement(ViewSize, 1 / Element.ViewScale, 1 / Element.ViewScale));
 
             Control.Invalidate();
         }
@@ -165,17 +161,27 @@ namespace Mandelbrot_Julia_Viewer.UWP
             {
                 Rectangle viewRect = new Rectangle
                 {
-                    Location = Matrix2.Enlargement(DrawImage.DrawRect.Location.Offset(-ViewPoint.X, -ViewPoint.Y), Scale, Scale),
-                    Size = Matrix2.Enlargement(DrawImage.DrawRect.Size, Scale, Scale)
+                    Location = Matrix2.Enlargement(DrawImage.DrawRect.Location.Offset(-Element.ViewPoint.X, -Element.ViewPoint.Y), Element.ViewScale, Element.ViewScale),
+                    Size = Matrix2.Enlargement(DrawImage.DrawRect.Size, Element.ViewScale, Element.ViewScale)
                 };
 
-                args.DrawingSession.DrawImage(DrawImage.Image as ICanvasImage, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect));
+                args.DrawingSession.DrawImage(DrawImage.Image as ICanvasImage, GetDeviceRect(viewRect), GetDeviceRect(DrawImage.DrawRect), 1f, CanvasImageInterpolation.HighQualityCubic);
             }
         }
 
         public Windows.Foundation.Rect GetDeviceRect(Rectangle rect)
         {
             return new Windows.Foundation.Rect(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+    }
+
+    public class DeviceBitmapCreator : IDeviceBitmapCreator
+    {
+        public Task<object> Create(byte[] imageData, int imageWidth, int imageHeight, int pixelByteCount)
+        {
+            return Task.Run(() => {
+                return (object)CanvasBitmap.CreateFromBytes(CanvasDevice.GetSharedDevice(), imageData, imageWidth, imageHeight, Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized, 96);
+            });
         }
     }
 }

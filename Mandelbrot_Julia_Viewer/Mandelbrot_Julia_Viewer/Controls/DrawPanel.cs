@@ -15,7 +15,6 @@ namespace Controls
         public class DrawImageStruct
         {
             public object Image { get; set; }
-            public Rectangle ViewRect { get; set; }
             public Rectangle DrawRect { get; set; }
         }
 
@@ -28,7 +27,6 @@ namespace Controls
                 return new DrawImageStruct
                 {
                     Image = deviceImage,
-                    ViewRect = drawRect,
                     DrawRect = drawRect
                 };
             });
@@ -42,12 +40,9 @@ namespace Controls
             return new DrawImageStruct
             {
                 Image = deviceImage,
-                ViewRect = drawRect,
                 DrawRect = drawRect
             };
         }
-
-        public Func<byte[], int, int, int, Task<object>> ImageCompile;
 
         private object deviceImage;
         public object DeviceImage
@@ -65,14 +60,13 @@ namespace Controls
         }
         public async void DeviceImageCompile()
         {
-            DeviceImage = await ImageCompile?.Invoke(ImageData, ImageWidth, ImageHeight, ImagePixelOfByteSize);
+            var bitmapCreator = DependencyService.Get<IDeviceBitmapCreator>();
+            DeviceImage = await bitmapCreator.Create(ImageData, ImageWidth, ImageHeight, ImagePixelOfByteSize);
         }
 
         public bool ImageDataValid { get { return ImagePixelOfByteSize > 0 && ImageData?.Length == ImageWidth * ImageHeight * ImagePixelOfByteSize; } }
 
         public Rectangle ImageRect { get { return new Rectangle(0, 0, ImageWidth, ImageHeight); } }
-        public Size ImageSize { get { return new Size(ImageWidth, ImageHeight); } }
-        public Point ImageOrigin { get { return new Point(ImageWidth / 2, ImageHeight / 2); } }
 
         public byte[] ImageData
         {
@@ -86,8 +80,7 @@ namespace Controls
             typeof(DrawPanel),
             default(byte[]),
             propertyChanged: (bindable, oldValue, newValue) => {
-                DrawPanel obj = bindable as DrawPanel;
-                if (obj != null && obj.ImageDataValid)
+                if (bindable is DrawPanel obj && obj.ImageDataValid)
                 {
                     obj.DeviceImageCompile();
                 }
@@ -105,8 +98,7 @@ namespace Controls
             typeof(DrawPanel),
             default(int),
             propertyChanged: (bindable, oldValue, newValue) => {
-                DrawPanel obj = bindable as DrawPanel;
-                if (obj != null && obj.ImageDataValid)
+                if (bindable is DrawPanel obj && obj.ImageDataValid)
                 {
                     obj.DeviceImageCompile();
                 }
@@ -124,8 +116,7 @@ namespace Controls
             typeof(DrawPanel),
             default(int),
             propertyChanged: (bindable, oldValue, newValue) => {
-                DrawPanel obj = bindable as DrawPanel;
-                if (obj != null && obj.ImageDataValid)
+                if (bindable is DrawPanel obj && obj.ImageDataValid)
                 {
                     obj.DeviceImageCompile();
                 }
@@ -143,11 +134,80 @@ namespace Controls
             typeof(DrawPanel),
             defaultValue: 4,
             propertyChanged: (bindable, oldValue, newValue) => {
-                DrawPanel obj = bindable as DrawPanel;
-                if (obj != null && obj.ImageDataValid)
+                if (bindable is DrawPanel obj && obj.ImageDataValid)
                 {
                     obj.DeviceImageCompile();
                 }
+            });
+
+        public Point ViewPoint
+        {
+            get { return (Point)GetValue(ViewPointProperty); }
+            set { SetValue(ViewPointProperty, value); }
+        }
+
+        public static readonly BindableProperty ViewPointProperty = BindableProperty.Create(
+            nameof(ViewPoint),
+            typeof(Point),
+            typeof(DrawPanel),
+            defaultValue: default(Point),
+            defaultBindingMode: BindingMode.TwoWay,
+            propertyChanged: (bindable, oldValue, newValue) => {
+            });
+
+        private double minViewScale = 0.01;
+        public double MinViewScale
+        {
+            get { return minViewScale; }
+            set
+            {
+                minViewScale = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double maxViewScale = double.NaN;
+        public double MaxViewScale
+        {
+            get { return maxViewScale; }
+            set
+            {
+                maxViewScale = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double ViewScale
+        {
+            get { return (double)GetValue(ViewScaleProperty); }
+            set
+            {
+                try
+                {
+                    SetValue(ViewScaleProperty, value);
+                }
+                catch
+                {
+                    if (value < MinViewScale)
+                        SetValue(ViewScaleProperty, MinViewScale);
+                    else if (value > MaxViewScale)
+                        SetValue(ViewScaleProperty, MaxViewScale);
+                }
+            }
+        }
+
+        public static readonly BindableProperty ViewScaleProperty = BindableProperty.Create(
+            nameof(ViewScale),
+            typeof(double),
+            typeof(DrawPanel),
+            defaultValue: 1d,
+            defaultBindingMode: BindingMode.TwoWay,
+            validateValue: (bindable, v) => {
+                DrawPanel obj = bindable as DrawPanel;
+                double value = (double)v;
+                return (double.IsNaN(obj.MinViewScale) || value >= obj.MinViewScale) && (double.IsNaN(obj.MaxViewScale) || value <= obj.MaxViewScale);
+            },
+            propertyChanged: (bindable, oldValue, newValue) => {
             });
 
         public ICommand TappedCommand
@@ -166,7 +226,7 @@ namespace Controls
 
         public void OnTapped(double x, double y)
         {
-            if (TappedCommand != null && TappedCommand.CanExecute(null))
+            if (TappedCommand != null && TappedCommand.CanExecute(new Point(x, y)))
                 TappedCommand?.Execute(new Point(x, y));
         }
 
@@ -186,7 +246,7 @@ namespace Controls
 
         public void OnDoubleTapped(double x, double y)
         {
-            if (DoubleTappedCommand != null && DoubleTappedCommand.CanExecute(null))
+            if (DoubleTappedCommand != null && DoubleTappedCommand.CanExecute(new Point(x, y)))
                 DoubleTappedCommand?.Execute(new Point(x, y));
         }
 
@@ -206,7 +266,7 @@ namespace Controls
 
         public void OnLongTapped(double x, double y)
         {
-            if (LongTappedCommand != null && LongTappedCommand.CanExecute(null))
+            if (LongTappedCommand != null && LongTappedCommand.CanExecute(new Point(x, y)))
                 LongTappedCommand?.Execute(new Point(x, y));
         }
 
@@ -270,5 +330,10 @@ namespace Controls
                 return Matrix2.Calc(size, new Matrix2 { m11 = Math.Cos(o), m12 = -Math.Sin(o), m21 = Math.Sin(o), m22 = Math.Cos(o), dx = 0, dy = 0 });
             }
         }
+    }
+
+    public interface IDeviceBitmapCreator
+    {
+        Task<object> Create(byte[] imageData, int imageWidth, int imageHeight, int pixelByteCount);
     }
 }

@@ -26,10 +26,10 @@ namespace Models
         }
         public void Push(T value)
         {
-            while (undoList.Count > undoPos + 1)
-                undoList.RemoveAt(undoList.Count - 1);
-            undoList.Add(value);
-            ++undoPos;
+            //while (undoList.Count > undoPos + 1)
+            //    undoList.RemoveAt(undoList.Count - 1);
+            //undoList.Add(value);
+            //++undoPos;
         }
         public T Undo()
         {

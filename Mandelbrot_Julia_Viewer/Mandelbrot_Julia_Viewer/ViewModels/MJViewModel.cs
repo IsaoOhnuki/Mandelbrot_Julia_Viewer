@@ -36,6 +36,8 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             }
         }
 
+        public Command<Point> DoubleTappedCommand { get; set; }
+
         public Command MandelbrotRun { get; set; }
         public Command JuliaRun { get; set; }
         public Command JuliaMupRun { get; set; }
@@ -191,6 +193,17 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
             }
         }
 
+        private double viewScale = 1;
+        public double ViewScale
+        {
+            get { return viewScale; }
+            set
+            {
+                viewScale = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void ColorResolutionChanged(object sender, PropertyChangedEventArgs e)
         {
 
@@ -281,6 +294,43 @@ namespace Mandelbrot_Julia_Viewer.ViewModels
                 }
                 FractalType = "MandelbrotSet";
             });
+
+            DoubleTappedCommand = new Command<Point>(async(point) => {
+                if (FractalType == "MandelbrotSet")
+                {
+                    XPos -= (Resolution / 2 - point.X) / (Resolution / 2) * Radius;
+                    YPos -= (Resolution / -2 + point.Y) / (Resolution / 2) * Radius;
+                    Radius /= 2;
+                    Repert = (short)(63d / Radius);
+                    MJI mji = new MJI
+                    {
+                        MJ = new Mandelbrot_Julia(XPos, YPos, Radius, Repert, Resolution, ColorParette),
+                        ColorResolution = (!UseColorParette ? null : new ColorResolution(Repert, ColorParette))
+                    };
+                    if (!UndoList.HasLast || UndoList.Last.MJ != mji.MJ)
+                    {
+                        mji.MJ.Data = await Mandelbrot_Julia.Mandelbrot(mji.MJ.XPos, mji.MJ.YPos, mji.MJ.Radius, mji.MJ.Repert, mji.MJ.Resolution);
+                        Image = mji.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
+                        UndoList.Push(mji);
+                        OnPropertyChanged(nameof(CanUndo));
+                        OnPropertyChanged(nameof(CanRedo));
+                    }
+                    else if (UndoList.Last.ColorResolution != mji.ColorResolution)
+                    {
+                        mji.MJ.Data = UndoList.Last.MJ.Data;
+                        Image = mji.Image = await Mandelbrot_Julia.Develop(mji.MJ.Repert, mji.MJ.Data, mji.ColorResolution);
+                        UndoList.Push(mji);
+                        OnPropertyChanged(nameof(CanUndo));
+                        OnPropertyChanged(nameof(CanRedo));
+                    }
+                    else
+                    {
+                        Image = mji.Image;
+                    }
+                    FractalType = "MandelbrotSet";
+                }
+            });
+
             JuliaRun = new Command(async () => {
                 MJI mji = new MJI {
                     MJ = new Mandelbrot_Julia(XPos, YPos, 0, 0, 2, Repert, Resolution, ColorParette),
