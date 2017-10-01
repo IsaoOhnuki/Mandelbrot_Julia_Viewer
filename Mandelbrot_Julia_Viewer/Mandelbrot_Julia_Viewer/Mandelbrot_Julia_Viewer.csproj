@@ -41,6 +41,7 @@
     <Compile Include="Behaviors\TappedAndPoint.cs" />
     <Compile Include="Controls\ColorPicker.cs" />
     <Compile Include="Controls\DrawPanel.cs" />
+    <Compile Include="Controls\DrawPanelContent.cs" />
     <Compile Include="Controls\GradationDrawer.cs" />
     <Compile Include="Models\ColorResolution.cs" />
     <Compile Include="ViewModels\MJViewModel.cs" />

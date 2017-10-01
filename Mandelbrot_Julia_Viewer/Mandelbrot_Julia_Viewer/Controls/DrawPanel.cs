@@ -331,9 +331,4 @@ namespace Controls
             }
         }
     }
-
-    public interface IDeviceBitmapCreator
-    {
-        Task<object> Create(byte[] imageData, int imageWidth, int imageHeight, int pixelByteCount);
-    }
 }
