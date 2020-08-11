@@ -16,8 +16,21 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0">
-            
+            <Label Content="X"/>
+            <TextBox Width="80" Text="{Binding XPos}"/>
+            <Label Content="Y"/>
+            <TextBox Width="80" Text="{Binding YPos}"/>
+            <Label Content="J"/>
+            <TextBox Width="80" Text="{Binding JPos}"/>
+            <Label Content="I"/>
+            <TextBox Width="80" Text="{Binding IPos}"/>
+            <Label Content="Radius"/>
+            <TextBox Width="80" Text="{Binding Radius}"/>
+            <Label Content="Repert"/>
+            <TextBox Width="80" Text="{Binding Repert}"/>
+            <Label Content="Resolution"/>
+            <TextBox Width="80" Text="{Binding Resolution}"/>
         </ToolBar>
-        <Image Grid.Row="1"/>
+        <Image Grid.Row="1" Source="{Binding Image}"/>
     </Grid>
 </Window>

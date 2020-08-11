@@ -59,6 +59,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MainWindowModel.cs" />
+    <Compile Include="Models\MJ.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -96,6 +97,11 @@
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Mandelbrot_Julia_Viewer\Mandelbrot_Julia_Viewer\Mandelbrot_Julia_Viewer.csproj">
+      <Project>{5DCA2738-FEBE-4898-9483-FF7EBA6643B3}</Project>
+      <Name>Mandelbrot_Julia_Viewer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
